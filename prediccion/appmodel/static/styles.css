@@ -1,0 +1,739 @@
+/* -------------------- INICIO - BODY GENERAL -------------------- */
+/* -------------------- INICIO - BODY GENERAL -------------------- */
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f8ff;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    padding-bottom: 100px;
+}
+
+header {
+    background-color: #0066cc;
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #0066cc;
+    color: white;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+/* -------------------- FINAL - BODY GENERAL -------------------- */
+/* -------------------- FINAL - BODY GENERAL -------------------- */
+
+/* -------------------- INICIO - Menu BASE y LOGOUT -------------------- */
+/* -------------------- INICIO - Menu BASE y LOGOUT -------------------- */
+
+.user-info-container {
+    background-color: #0066cc;
+    padding: 15px;
+    border-radius: 8px;
+    display: inline-block;
+    color: white;
+    font-size: 18px;
+}
+
+.user-info-container span {
+    margin-right: 20px;
+}
+
+.logout-button {
+    background-color: #ff4c4c;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.logout-button:hover {
+    background-color: #ff6666;
+}
+
+.logout-button:focus, 
+.logout-button:active {
+    outline: none;
+    box-shadow: none;
+}
+
+.logo img {
+    height: 50px;
+}
+
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.button {
+    border: none;
+    color: white;
+    padding: 14px 28px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 10px;
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+.primary {
+    background-color: #0066cc;
+}
+
+.primary:hover {
+    background-color: #0b7dda;
+}
+
+/* -------------------- FINAL - Menu BASE y LOGOUT -------------------- */
+/* -------------------- FINAL - Menu BASE y LOGOUT -------------------- */
+
+/* -------------------- INICIO - Container BASICO -------------------- */
+/* -------------------- INICIO - Container BASICO -------------------- */
+
+.form-container {
+    background-color: white;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 50px auto;
+    max-width: 500px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-container h2 {
+    text-align: center;
+    color: #0066cc;
+}
+
+.form-container label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+}
+
+.form-container input[type="text"],
+.form-container input[type="number"],
+.form-container input[type="password"] {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+.form-container button {
+    background-color: #0066cc;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    width: 100%;
+    font-family: 'Arial', sans-serif;
+    font-size: 16px; 
+    margin-bottom: 10px;
+}
+
+/* -------------------- FINAL - Container BASICO -------------------- */
+/* -------------------- FINAL - Container BASICO -------------------- */
+
+/* -------------------- INICIO - Container de REGISTRO -------------------- */
+/* -------------------- INICIO - Container de REGISTRO -------------------- */
+
+.form-register-container {
+    background-color: white;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 50px auto;
+    max-width: 100%;
+    width: 90%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 50px;
+}
+
+.form-register-container h2 {
+    text-align: center;
+    color: #0066cc;
+}
+
+.form-register-container form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-register-container .button-group {
+    grid-column: 2 / 3; 
+    justify-self: center;
+    display: flex;
+    gap: 10px;
+    margin-top: 1px;
+}
+
+.form-register-container label {
+    font-weight: bold;
+}
+
+.form-register-container input[type="text"],
+.form-register-container input[type="number"],
+.form-register-container select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+.form-register-container button {
+    background-color: #0066cc;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    grid-column: 2 / 3;
+    justify-self: center;
+    margin-top: 1px;
+    transition: background-color 0.3s ease;
+}
+
+
+.form-register-container button:hover {
+    background-color: #0b7dda;
+}
+
+@media screen and (max-width: 768px) {
+    .form-register-container form {
+        grid-template-columns: 1fr;
+    }
+
+    .form-register-container button {
+        grid-column: span 1;
+    }
+}
+
+/* -------------------- FIN - Container de REGISTRO -------------------- */
+/* -------------------- FIN - Container de REGISTRO -------------------- */
+
+/* -------------------- INICIO - Container de CONSULTA -------------------- */
+/* -------------------- INICIO - Container de CONSULTA -------------------- */
+
+/* Contenedor principal del formulario */
+.form-consulta-container {
+    background-color: white;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 50px auto;
+    max-width: 600px; /* Limitar el ancho máximo */
+    width: 100%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 50px;
+}
+
+/* Estilo del título del formulario */
+.form-consulta-container h2 {
+    text-align: center;
+    color: #0066cc;
+}
+
+/* Estructura del formulario */
+.form-consulta-container form {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centrar los inputs y botones */
+}
+
+/* Estilo de cada grupo de formulario */
+.form-consulta-group {
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+/* Estilo de los labels */
+.form-consulta-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+/* Estilo de los campos de entrada (inputs y select) */
+.form-consulta-container input[type="text"],
+.form-consulta-container input[type="number"],
+.form-consulta-container select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+/* Grupo de botones con espaciado */
+.button-group {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+/* Estilo de los botones */
+.form-consulta-container button {
+    background-color: #0066cc;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+/* Cambiar el color del botón al hacer hover */
+.form-consulta-container button:hover {
+    background-color: #0b7dda;
+}
+
+/* Estilo para pantallas pequeñas */
+@media screen and (max-width: 768px) {
+    .form-consulta-container {
+        width: 90%;
+    }
+
+    .button-group {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+    }
+
+    .form-consulta-group {
+        width: 100%;
+    }
+}
+
+
+/* -------------------- FIN - Container de CONSULTA -------------------- */
+/* -------------------- FIN - Container de CONSULTA -------------------- */
+
+
+
+/* -------------------- INICIO - Container de APLICACION/REGISTRO -------------------- */
+/* -------------------- INICIO - Container de APLICACION/REGISTRO -------------------- */
+
+.tab-container {
+    width: 100%;
+    text-align: center;
+    background-color: white;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 50px auto;
+    max-width: 100%;
+    width: 90%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 10px;
+}
+
+.tabs {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.tablink {
+    background-color: white;
+    border: 2px solid #0066cc;
+    outline: none;
+    cursor: pointer;
+    padding: 14px 16px;
+    font-size: 17px;
+    color: #0066cc;
+    transition: 0.3s;
+    margin: 0 5px;
+    border-radius: 3px;
+}
+
+.tablink.active {
+    background-color: #0066cc;
+    color: white;
+    border-radius: 15px;
+}
+
+.tabcontent {
+    background-color: white;
+    border-radius: 5px;
+    padding: 20px;
+    margin: 5px auto;
+    max-width: 100%;
+    width: 90%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1px;
+}
+
+.tab-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.tabcontent:first-child {
+    display: block;
+}
+
+.tab-container h2 {
+    text-align: center;
+    color: #0066cc;
+}
+
+.tab-container form {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
+}
+
+.tab-container label {
+    font-weight: bold;
+}
+
+.tab-container input[type="text"],
+.tab-container input[type="number"],
+.tab-container select {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+.tab-container form button {
+    background-color: #0066cc;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    grid-column: span 3;
+    justify-self: center;
+    margin-top: 1px;
+    transition: background-color 0.3s ease;
+}
+
+.tab-container form button:hover {
+    background-color: #0b7dda;
+}
+
+.button-group {
+    display: flex;
+    justify-content: center;
+    grid-column: span 3;
+    gap: 15px; 
+    margin-top: 20px;
+}
+
+@media screen and (max-width: 768px) {
+    .tab-container form {
+        grid-template-columns: 1fr;
+    }
+
+    .button-group {
+        grid-column: span 1;
+    }
+}
+
+/* -------------------- FIN - Container de APLICACION/REGISTRO -------------------- */
+/* -------------------- FIN - Container de APLICACION/REGISTRO -------------------- */
+
+.primary {background-color: #0066cc;} 
+.primary:hover {background: #0b7dda;}
+
+.menu-container h2 {
+    text-align: center;
+    color: #0066cc;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.menu-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 70vh;
+}
+
+.menu-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-content: space-between;
+    width: 650px;
+    background-color: #e6f7ff;
+    border: 2px solid #007bff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+
+.menu-button {
+    border: none;
+    color: white;
+    cursor: pointer; 
+    border-radius: 10px;
+    font-size: 20px;
+    text-align: center;
+    height: 150px;
+    width: calc(33.33% - 20px);
+    margin: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #007bff;
+    text-decoration: none; 
+}
+
+.menu-button:hover {
+    background-color: #3399ff; 
+    text-decoration: none;
+}
+
+.menu-button a {
+    color: white;
+    text-decoration: none;
+}
+
+.dropbtn {
+    background-color: #0066cc;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 10px;
+    font-family: 'Arial', sans-serif;
+}
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 16px;
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #0b7dda;
+    min-width: 105px;
+    z-index: 1;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    border-radius: 5px;
+    font-family: 'Arial', sans-serif;
+    text-align: center; /* Centra el contenido */
+}
+  
+.dropdown-content a {
+    color: white;
+    padding: 10px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    border-radius: 5px;
+    font-family: 'Arial', sans-serif;
+}
+  
+.dropdown-content a:hover {
+    background-color: #a2d5ffb2;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .dropbtn {
+    background-color: #0b7dda;
+}
+
+/* -------------------- INICIO - TABLA INDEX -------------------- */
+/* -------------------- INICIO - TABLA INDEX -------------------- */
+
+.datagrid-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 25px;
+    gap: 2%;
+}
+
+.datagrid {
+    font: normal 12px/150% Arial, Helvetica, sans-serif;
+    background: #fff;
+    overflow: hidden;
+    border: 1px solid #006699;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    display: inline-block;
+    flex: 1;
+    margin: 0 1%;
+}
+
+.datagrid table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.datagrid table td, 
+.datagrid table th {
+    padding: 3px 5px;
+}
+
+.datagrid table thead th {
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #0b7dda));
+    background: -moz-linear-gradient(center top, #006699 5%, #00557F 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');
+    background-color: #006699;
+    color: #FFFFFF;
+    font-size: 13px;
+    font-weight: bold;
+    border-left: 1px solid #0070A8;
+}
+
+.datagrid table tfoot td div {
+    border-top: 1px solid #0b7dda;
+    background: #E1EEF4;
+}
+
+.datagrid table tfoot td {
+    padding: 0;
+    font-size: 12px;
+}
+
+.datagrid table tfoot td div {
+    padding: 2px;
+}
+
+.datagrid table tfoot td ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: right;
+}
+
+.datagrid table tfoot li {
+    display: inline;
+}
+
+.datagrid table tfoot li a {
+    text-decoration: none;
+    display: inline-block;
+    padding: 2px 8px;
+    margin: 1px;
+    color: #FFFFFF;
+    border: 1px solid #0b7dda;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0.05, #0b7dda), color-stop(1, #0b7dda));
+    background: -moz-linear-gradient(center top, #0b7dda 5%, #0b7dda 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');
+    background-color: #0b7dda;
+}
+
+/* -------------------- FIN - TABLA INDEX -------------------- */
+/* -------------------- FIN - TABLA INDEX -------------------- */
+
+/* -------------------- INICIO - PREDICCIONES -------------------- */
+/* -------------------- INICIO - PREDICCIONES -------------------- */
+
+.predicciones-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px; /* Separación entre los elementos */
+    margin-bottom: 20px;
+}
+.prediccion {
+    flex: 1;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+.semaforo-verde {
+    background-color: #4CAF50;
+    color: white;
+}
+.semaforo-amarillo {
+    background-color: #FFEB3B;
+    color: black;
+}
+.semaforo-rojo {
+    background-color: #F44336;
+    color: white;
+}
+ul {
+    text-align: left; /* Alineación izquierda para las listas */
+}
+
+.predicciones-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px; /* Separación entre los elementos */
+    margin-bottom: 20px;
+}
+.prediccion {
+    flex: 1;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+.semaforo-verde {
+    background-color: #4CAF50;
+    color: white;
+}
+.semaforo-amarillo {
+    background-color: #FFEB3B;
+    color: black;
+}
+.semaforo-rojo {
+    background-color: #F44336;
+    color: white;
+}
+ul {
+    text-align: left; /* Alineación izquierda para las listas */
+}
+
+/* -------------------- FIN - PREDICCIONES -------------------- */
+/* -------------------- FIN - PREDICCIONES -------------------- */

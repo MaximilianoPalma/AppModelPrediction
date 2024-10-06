@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Análisis de Pacientes{% endblock %}
+
+{% block content %}
+<div class="tab-container">
+    <div class="tabs">
+        <button class="tablink active button" onclick="openTab(event, 'nuevo')">Paciente nuevo</button>
+        <button class="tablink button" onclick="openTab(event, 'existente')">Paciente existente</button>
+    </div>
+
+    <div id="nuevo" class="tabcontent" style="display: block;">
+
+        <h2>Análisis de Paciente NO Registrado</h2>
+        <form action="{% url 'index' %}" method="post">
+            {% csrf_token %}
+    
+            <div class="tab-group">
+                <label for="rut">RUT:</label>
+                <input type="text" id="rut" name="rut" placeholder="Ingrese RUT" required>
+            </div>
+    
+            <div class="tab-group">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Ingrese nombre" required>
+            </div>
+    
+            <div class="tab-group">
+                <label for="apellido">Apellido:</label>
+                <input type="text" id="apellido" name="apellido" placeholder="Ingrese apellido" required>
+            </div>
+    
+            <div class="tab-group">
+                <label for="age">Edad:</label>
+                <input type="number" id="age" name="age" min="0" max="120" placeholder="Ingrese la edad" required>
+            </div>
+    
+            <div class="tab-group">
+                <label for="nacimiento">Fecha de nacimiento:</label>
+                <input type="text" id="nacimiento" name="nacimiento" required>
+            </div>
+
+            <div class="tab-group">
+                <label for="gender">Género:</label>
+                <select id="gender" name="gender" required>
+                    <option value="" disabled selected>Seleccione una opción</option>
+                    <option value="1">Hombre</option>
+                    <option value="0">Mujer</option>
+                    <option value="2">Otro</option>
+                </select>
+            </div>
+    
+            <div class="tab-group">
+                <label for="bmi">Índice de Masa Corporal (BMI):</label>
+                <input type="number" step="0.01" id="bmi" name="bmi" min="0" placeholder="Ingrese el BMI" required>
+            </div>
+    
+            <div class="tab-group">
+                <label for="hypertension">Hipertensión:</label>
+                <select id="hypertension" name="hypertension" required>
+                    <option value="" disabled selected>Seleccione una opción</option>
+                    <option value="1">Sí</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+    
+            <div class="tab-group">
+                <label for="heart_disease">Enfermedad Cardiaca:</label>
+                <select id="heart_disease" name="heart_disease" required>
+                    <option value="" disabled selected>Seleccione una opción</option>
+                    <option value="1">Sí</option>
+                    <option value="0">No</option>
+                </select>
+            </div>
+    
+            <div class="tab-group">
+                <label for="hba1c_level">Nivel de HbA1c:</label>
+                <input type="number" step="0.01" id="hba1c_level" name="hba1c_level" min="0" placeholder="Ingrese el nivel de HbA1c" required>
+            </div>
+    
+            <div class="tab-group">
+                <label for="blood_glucose_level">Nivel de Glucosa en Sangre:</label>
+                <input type="number" step="0.01" id="blood_glucose_level" name="blood_glucose_level" min="0" placeholder="Ingrese el nivel de glucosa" required>
+            </div>
+    
+            <div class="tab-group">
+                <label for="smoking_history">Historial de Tabaquismo:</label>
+                <select id="smoking_history" name="smoking_history" required>
+                    <option value="" disabled selected>Seleccione una opción</option>
+                    <option value="0">Nunca</option>
+                    <option value="1">Ex-fumador</option>
+                    <option value="2">Fumador ocasional</option>
+                    <option value="3">Fumador habitual</option>
+                </select>
+            </div>
+    
+            <div class="button-group">
+                <button type="submit">Análisis y registro</button>
+                <button type="submit">Solo análisis</button>
+            </div>
+        </form>
+
+    </div>
+
+    <div id="existente" class="tabcontent form-register-container" style="display:none">
+        <h2>Análisis de Paciente Registrado</h2>
+        <form action="{% url 'index' %}" method="post">
+            {% csrf_token %}
+        
+            <div class="form-group">
+                <label for="rut">RUT:</label>
+                <input type="text" id="rut" name="rut" placeholder="Ingrese RUT" required>
+            </div>
+        
+            <div class="form-group">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Esperando resultados..." disabled>
+            </div>
+        
+            <div class="form-group">
+                <label for="apellido">Apellido:</label>
+                <input type="text" id="apellido" name="apellido" placeholder="Esperando resultados..." disabled>
+            </div>
+        
+            <button type="submit">Buscar datos</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+
+        // Ocultar todas las pestañas
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+        }
+
+        // Eliminar la clase 'active' de todos los botones de pestañas
+        tablinks = document.getElementsByClassName("tablink");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Mostrar la pestaña seleccionada y añadir la clase 'active' al botón correspondiente
+        document.getElementById(tabName).style.display = "block";
+        evt.currentTarget.className += " active";
+    }
+
+    // Mostrar la pestaña de "Paciente Nuevo" al cargar la página
+    document.getElementById("nuevo").style.display = "block";
+
+    $(function() {
+        $("#nacimiento").datepicker({
+            dateFormat: "dd-mm-yy"
+        });
+    });
+
+</script>
+
+{% endblock %}

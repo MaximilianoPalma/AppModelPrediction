@@ -1,0 +1,228 @@
+<!-- templates/consulta.html -->
+{% extends 'base.html' %}
+
+{% block title %}Consulta y Predicción{% endblock %}
+
+{% block content %}
+
+<div class="form-register-container">
+    <h2>Búsqueda de paciente</h2>
+    <form action="{% url 'consulta_paciente' %}" method="post" id="form-busqueda">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="rut">RUT:</label>
+            <input type="text" id="rut" name="rut" value="{{ paciente.rut|default_if_none:'' }}" placeholder="Ingrese RUT" required>
+        </div>
+
+        <div class="form-group">
+            <label for="nombre">Nombre:</label>
+            <input type="text" id="nombre" name="nombre" value="{{ nombre|default_if_none:'' }}" placeholder="Esperando resultados..." readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="apellido">Apellido:</label>
+            <input type="text" id="apellido" name="apellido" value="{{ apellido|default_if_none:'' }}" placeholder="Esperando resultados..." readonly>
+        </div>
+
+        <div class="button-group">
+            <button type="submit">Buscar datos</button>
+            <button type="button" onclick="limpiarFormulario()">Limpiar datos</button>
+        </div>
+    </form>
+</div>
+
+<div class="form-register-container">
+    <h2>Datos paciente</h2>
+    <form action="{% url 'evaluacion_riesgo' %}" method="post" id="form-prediccion">
+        {% csrf_token %}
+        
+        <!-- Campo oculto para mantener el RUT -->
+        <input type="hidden" id="rut_hidden" name="rut" value="{{ paciente.rut|default_if_none:'' }}">
+
+        <!-- Campos del paciente obtenidos de la búsqueda -->
+        <div class="form-group">
+            <label for="age">Edad:</label>
+            <input type="number" id="age" name="age" value="{{ age|default_if_none:'' }}" placeholder="Esperando resultados..." readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="gender">Género:</label>
+            <select id="gender" name="gender" readonly>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="1" {% if gender == 1 %} selected {% endif %}>Hombre</option>
+                <option value="0" {% if gender == 0 %} selected {% endif %}>Mujer</option>
+                <option value="2" {% if gender == 2 %} selected {% endif %}>Otro</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="bmi">Índice de Masa Corporal (BMI):</label>
+            <input type="number" step="0.01" id="bmi" name="bmi" value="{{ bmi|default_if_none:'' }}" placeholder="Esperando resultados..." readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="hypertension">Hipertensión:</label>
+            <select id="hypertension" name="hypertension" readonly>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="1" {% if hypertension == 1 %} selected {% endif %}>Sí</option>
+                <option value="0" {% if hypertension == 0 %} selected {% endif %}>No</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="heart_disease">Enfermedad Cardiaca:</label>
+            <select id="heart_disease" name="heart_disease" readonly>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="1" {% if heart_disease == 1 %} selected {% endif %}>Sí</option>
+                <option value="0" {% if heart_disease == 0 %} selected {% endif %}>No</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="HbA1c_level">Nivel de HbA1c:</label>
+            <input type="number" step="0.01" id="HbA1c_level" name="HbA1c_level" value="{{ hba1c_level|default_if_none:'' }}" placeholder="Esperando resultados..." readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="blood_glucose_level">Nivel de Glucosa en Sangre:</label>
+            <input type="number" step="0.01" id="blood_glucose_level" name="blood_glucose_level" value="{{ blood_glucose_level|default_if_none:'' }}" placeholder="Esperando resultados..." readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="smoking_history">Historial de Tabaquismo:</label>
+            <select id="smoking_history" name="smoking_history" readonly>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="0" {% if smoking_history == 0 %} selected {% endif %}>Nunca</option>
+                <option value="1" {% if smoking_history == 1 %} selected {% endif %}>Ex-fumador</option>
+                <option value="2" {% if smoking_history == 2 %} selected {% endif %}>Fumador ocasional</option>
+                <option value="3" {% if smoking_history == 3 %} selected {% endif %}>Fumador habitual</option>
+            </select>
+        </div>
+
+        <div class="button-group">
+            <button type="submit">Predecir</button>
+        </div>
+    </form>
+</div>
+
+<!-- Div separado para los resultados de la predicción -->
+<div class="form-register-container" id="container-resultados">
+    
+    <h2>Resultados</h2>
+
+    <!-- Contenedor de las predicciones -->
+    <div class="predicciones-container">
+            
+        <!-- Predicción Random Forest -->
+        <div class="prediccion {% if rf_prediction > 60 %}semaforo-rojo{% elif rf_prediction > 30 %}semaforo-amarillo{% else %}semaforo-verde{% endif %}">
+            <p><strong>Random Forest:</strong> {{ rf_prediction|floatformat:2 }}%</p>
+            
+            <!-- Mostrar factores relevantes solo si la predicción es alta -->
+            {% if rf_prediction > 30 %}
+            <p><strong>Interpretación:</strong> Este porcentaje indica que el paciente tiene un riesgo de diabetes basado en los siguientes factores:</p>
+            <ul>
+                {% if blood_glucose_level > 125 %}
+                <li>Glucosa elevada (contribuye al riesgo)</li>
+                {% endif %}
+                {% if bmi > 25 %}
+                <li>IMC alto (sobrepeso u obesidad)</li>
+                {% endif %}
+                {% if age > 60 %}
+                <li>Edad avanzada</li>
+                {% endif %}
+            </ul>
+            {% else %}
+            <p>El riesgo es bajo, mantén hábitos saludables para prevenir la enfermedad.</p>
+            {% endif %}
+        </div>
+
+        <!-- Predicción SVM -->
+        <div class="prediccion {% if svm_prediction > 60 %}semaforo-rojo{% elif svm_prediction > 30 %}semaforo-amarillo{% else %}semaforo-verde{% endif %}">
+            <p><strong>Support Vector Machine:</strong> {{ svm_prediction|floatformat:2 }}%</p>
+            
+            {% if svm_prediction > 30 %}
+            <p><strong>Interpretación:</strong> Este porcentaje refleja un riesgo moderado de diabetes, influenciado por los siguientes factores:</p>
+            <ul>
+                {% if blood_glucose_level > 125 %}
+                <li>Glucosa elevada</li>
+                {% endif %}
+                {% if hypertension %}
+                <li>Hipertensión</li>
+                {% endif %}
+            </ul>
+            {% else %}
+            <p>El riesgo es bajo, sigue con hábitos saludables.</p>
+            {% endif %}
+        </div>
+
+        <!-- Predicción Regresión Logística -->
+        <div class="prediccion {% if logistic_prediction > 60 %}semaforo-rojo{% elif logistic_prediction > 30 %}semaforo-amarillo{% else %}semaforo-verde{% endif %}">
+            <p><strong>Regresión Logística:</strong> {{ logistic_prediction|floatformat:2 }}%</p>
+
+            {% if logistic_prediction > 30 %}
+            <p><strong>Interpretación:</strong> Este porcentaje indica un riesgo alto, basado en factores como:</p>
+            <ul>
+                {% if smoking_history == 'current' %}
+                <li>Historial de tabaquismo (fumador actual)</li>
+                {% endif %}
+                {% if HbA1c_level > 6.5 %}
+                <li>Niveles elevados de HbA1c</li>
+                {% endif %}
+            </ul>
+            {% else %}
+            <p>El riesgo es bajo. Continúa con hábitos saludables.</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- Plan de Acción según Factores de Riesgo -->
+    <div class="recomendacion">
+        <h2>Plan de Acción según Factores de Riesgo:</h2>
+
+        {% if blood_glucose_level > 125 %}
+        <p><strong>Glucosa elevada:</strong> Se recomienda una dieta baja en carbohidratos, aumento de actividad física y consulta con un endocrinólogo.</p>
+        {% endif %}
+
+        {% if HbA1c_level > 6.5 %}
+        <p><strong>Niveles altos de HbA1c:</strong> Control estricto del azúcar en sangre y posibles cambios en el tratamiento. Se sugiere un control trimestral.</p>
+        {% endif %}
+
+        {% if hypertension %}
+        <p><strong>Hipertensión presente:</strong> Reducción del consumo de sal, control de la presión arterial y una dieta balanceada baja en grasas saturadas.</p>
+        {% endif %}
+    </div>
+
+    <div class="recomendacion">
+        {% if rf_prediction > 50 or svm_prediction > 50 or logistic_prediction > 50 %}
+        <p><strong>Recomendación:</strong> El riesgo de diabetes es alto. Se recomienda una evaluación médica.</p>
+        {% else %}
+        <p><strong>Recomendación:</strong> El riesgo de diabetes es bajo. Mantén hábitos saludables.</p>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function limpiarFormulario() {
+    // Limpiar el formulario de búsqueda
+    document.getElementById('rut').value = '';
+    document.getElementById('nombre').value = '';
+    document.getElementById('apellido').value = '';
+
+    // Limpiar el formulario de predicción
+    document.getElementById('rut_hidden').value = '';
+    document.getElementById('age').value = '';
+    document.getElementById('gender').selectedIndex = 0;
+    document.getElementById('bmi').value = '';
+    document.getElementById('hypertension').selectedIndex = 0;
+    document.getElementById('heart_disease').selectedIndex = 0;
+    document.getElementById('HbA1c_level').value = '';
+    document.getElementById('blood_glucose_level').value = '';
+    document.getElementById('smoking_history').selectedIndex = 0;
+
+    // Limpiar los resultados
+    document.getElementById('resultados-prediccion').innerHTML = '';
+}
+</script>
+
+{% endblock %}
