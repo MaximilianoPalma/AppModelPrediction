@@ -1,0 +1,5 @@
+- Crear un link directo desde el RUT a la página de Predicción
+- Crear el apartado de Aplicación de Modelo a usuarios NO registrados
+- Limpiar la página de Consulta cada vez que se recargue para que no queden
+	los datos anteriores
+- Ocultar las Recomendaciones si aún no se hace la Predicción
