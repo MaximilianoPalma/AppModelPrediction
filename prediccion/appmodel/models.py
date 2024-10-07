@@ -11,7 +11,7 @@ class Paciente(models.Model):
     apellido = models.CharField(max_length=100)
     edad = models.IntegerField()
     nacimiento = models.DateField()
-    genero = models.IntegerField(choices=[(1, 'Hombre'), (0, 'Mujer'), (2, 'Otro')])
+    genero = models.IntegerField(choices=[(0, 'Mujer'), (1, 'Hombre'),  (2, 'Otro')])
     bmi = models.DecimalField(max_digits=5, decimal_places=2)
     hipertension = models.BooleanField()
     enfermedad_cardiaca = models.BooleanField()
