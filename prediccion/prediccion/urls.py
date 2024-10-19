@@ -22,6 +22,6 @@ urlpatterns = [
 
     path('soporte/', login_required(views.soporte), name = 'soporte'),
     
-    path('evaluacion-riesgo/', login_required(views.evaluacion_riesgo), name='evaluacion_riesgo'),  # Ruta correcta
+    path('evaluacion-riesgo/', login_required(views.evaluacion_riesgo), name='evaluacion_riesgo'),
 
 ]

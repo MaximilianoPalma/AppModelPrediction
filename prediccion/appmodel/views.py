@@ -48,7 +48,6 @@ def registro_paciente(request):
         nivel_glucosa = request.POST['blood_glucose_level']
         historial_tabaquismo = request.POST['smoking_history']
         
-        # Guardar los datos en la base de datos
         Paciente.objects.create(
             rut=rut,
             nombre=nombre,
@@ -76,7 +75,6 @@ def consulta_paciente(request):
         rut = request.POST.get('rut')
         
         try:
-            # Buscar al paciente por RUT
             paciente = Paciente.objects.get(rut=rut)
         except Paciente.DoesNotExist:
             paciente = None
@@ -107,9 +105,9 @@ def consulta_paciente(request):
     if request.method == 'POST':
         rut = request.POST.get('rut')
         try:
-            # Buscar al paciente por RUT
+
             paciente = Paciente.objects.get(rut=rut)
-            # Retornar los datos del paciente en el contexto
+
             return render(request, 'consulta.html', {
                 'paciente': paciente,
                 'nombre': paciente.nombre,
@@ -125,16 +123,10 @@ def consulta_paciente(request):
                 'smoking_history': paciente.historial_tabaquismo,
             })
         except Paciente.DoesNotExist:
-            # Si el paciente no existe
+
             return render(request, 'consulta.html', {'error': 'Paciente no encontrado'})
     return render(request, 'consulta.html')
 
-#----------------------------------------------------------------------------------------------------#
-#----------------------------------------------------------------------------------------------------#
-#----------------------------------------------------------------------------------------------------#
-
-
-# Cargar los modelos y el escalador
 base_dir = settings.BASE_DIR
 
 rf_model_path = os.path.join(base_dir, 'appmodel\\algoritmos', 'random_forest_model.pkl')
@@ -147,15 +139,12 @@ svm_model = joblib.load(svm_model_path)
 logistic_model = joblib.load(logistic_model_path)
 scaler = joblib.load(scaler_path)
 
-# Definir las columnas esperadas en el orden correcto
 columnas_entrenamiento = scaler.feature_names_in_
-
 
 @login_required
 def evaluacion_riesgo(request):
     if request.method == 'POST':
         try:
-            # Obtener los datos del formulario
             age = int(request.POST.get('age'))
             gender = request.POST.get('gender')
             hypertension = int(request.POST.get('hypertension'))
@@ -165,7 +154,6 @@ def evaluacion_riesgo(request):
             Hba1c_level = float(request.POST.get('HbA1c_level'))
             blood_glucose_level = float(request.POST.get('blood_glucose_level'))
 
-            # Crear un DataFrame temporal con las características de entrada
             input_data = {
                 'age': [age],
                 'bmi': [bmi],
@@ -179,29 +167,22 @@ def evaluacion_riesgo(request):
             input_data_df['gender'] = gender
             input_data_df['smoking_history'] = smoking_history
 
-            # One-hot encoding
             input_data_encoded = pd.get_dummies(input_data_df, columns=['gender', 'smoking_history'])
 
-            # Verificar que todas las columnas necesarias existan y estén en el mismo orden que en el entrenamiento
             for col in columnas_entrenamiento:
                 if col not in input_data_encoded.columns:
                     input_data_encoded[col] = 0
 
-            # Reordenar las columnas
             input_data_encoded = input_data_encoded[columnas_entrenamiento]
 
-            # Escalar los datos de entrada
             input_data_scaled = scaler.transform(input_data_encoded)
 
-            # Predicciones con los modelos
             rf_proba = rf_model.predict_proba(input_data_scaled)[0][1] * 100
             svm_proba = svm_model.decision_function(input_data_scaled)
             logistic_proba = logistic_model.predict_proba(input_data_scaled)[0][1] * 100
 
-            # Convertir la salida de SVM a probabilidad usando la función sigmoide
             svm_risk = (1 / (1 + np.exp(-svm_proba))) * 100
 
-            # Contexto con las predicciones
             context = {
                 'rf_prediction': round(rf_proba, 2),
                 'svm_prediction': round(svm_risk[0], 2),
@@ -211,7 +192,6 @@ def evaluacion_riesgo(request):
                 'hypertension': hypertension
             }
 
-            # Devolver el contexto a la misma plantilla
             return render(request, 'consulta.html', context)
 
         except Exception as e:
@@ -219,3 +199,7 @@ def evaluacion_riesgo(request):
             return render(request, 'consulta.html', {'error': 'Ocurrió un error durante la predicción.'})
 
     return render(request, 'consulta.html')
+
+@login_required
+def subgrupos(request):
+    pass

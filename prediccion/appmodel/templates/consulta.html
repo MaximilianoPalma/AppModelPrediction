@@ -36,10 +36,8 @@
     <form action="{% url 'evaluacion_riesgo' %}" method="post" id="form-prediccion">
         {% csrf_token %}
         
-        <!-- Campo oculto para mantener el RUT -->
         <input type="hidden" id="rut_hidden" name="rut" value="{{ paciente.rut|default_if_none:'' }}">
 
-        <!-- Campos del paciente obtenidos de la búsqueda -->
         <div class="form-group">
             <label for="age">Edad:</label>
             <input type="number" id="age" name="age" value="{{ age|default_if_none:'' }}" placeholder="Esperando resultados..." readonly>
@@ -105,12 +103,10 @@
     </form>
 </div>
 
-<!-- Div separado para los resultados de la predicción -->
 <div class="form-register-container" id="container-resultados">
     
     <h2>Resultados</h2>
 
-    <!-- Contenedor de las predicciones -->
     <div class="predicciones-container">
             
         <!-- Predicción Random Forest -->
@@ -204,12 +200,10 @@
 
 <script>
 function limpiarFormulario() {
-    // Limpiar el formulario de búsqueda
     document.getElementById('rut').value = '';
     document.getElementById('nombre').value = '';
     document.getElementById('apellido').value = '';
 
-    // Limpiar el formulario de predicción
     document.getElementById('rut_hidden').value = '';
     document.getElementById('age').value = '';
     document.getElementById('gender').selectedIndex = 0;
@@ -220,7 +214,6 @@ function limpiarFormulario() {
     document.getElementById('blood_glucose_level').value = '';
     document.getElementById('smoking_history').selectedIndex = 0;
 
-    // Limpiar los resultados
     document.getElementById('resultados-prediccion').innerHTML = '';
 }
 </script>
