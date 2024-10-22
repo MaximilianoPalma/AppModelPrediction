@@ -199,7 +199,3 @@ def evaluacion_riesgo(request):
             return render(request, 'consulta.html', {'error': 'Ocurrió un error durante la predicción.'})
 
     return render(request, 'consulta.html')
-
-@login_required
-def subgrupos(request):
-    pass
