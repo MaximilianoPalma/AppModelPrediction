@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Diabetes en Chile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .report-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: auto;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #eceff1;
+            border-radius: 8px;
+        }
+        .section h2 {
+            background-color: #4bc0ba;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stats-container {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .stat {
+            text-align: center;
+            flex: 1;
+            padding: 10px;
+        }
+        .stat h3 {
+            font-size: 2em;
+            color: #0cafa7;
+        }
+        .stat small {
+            display: block;
+            font-size: 0.8em;
+            color: #607d8b;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #607d8b;
+        }
+    </style>
+</head>
+<body>
+    <div class="report-container">
+        <h1 style="text-align: center; color: #37474f;">Reporte de Casos de Diabetes en Chile</h1>
+
+        <!-- Casos confirmados -->
+        <div class="section">
+            <h2>Casos Confirmados</h2>
+            <div class="stats-container">
+                <div class="stat">
+                    <h3>{{ promedio_diario }}</h3>
+                    <small>Promedio diario de casos</small>
+                </div>
+                <div class="stat">
+                    <h3>{{ total_semanal }}</h3>
+                    <small>Total semanal de casos</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Laboratorio -->
+        <div class="section">
+            <h2>Laboratorio</h2>
+            <div class="stats-container">
+                <div class="stat">
+                    <h3>{{ test_realizados }}</h3>
+                    <small>Total de exámenes realizados</small>
+                </div>
+                <div class="stat">
+                    <h3>{{ nuevos_casos_diarios }}</h3>
+                    <small>Nuevos casos diarios estimados</small>
+                </div>
+                <div class="stat">
+                    <h3>{{ nuevos_casos_semanales }}</h3>
+                    <small>Nuevos casos semanales estimados</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Casos fallecidos -->
+        <div class="section">
+            <h2>Casos Fallecidos</h2>
+            <div class="stats-container">
+                <div class="stat">
+                    <h3>{{ fallecidos_semanales }}</h3>
+                    <small>Fallecidos reportados esta semana</small>
+                </div>
+                <div class="stat">
+                    <h3>{{ fallecidos_totales }}</h3>
+                    <small>Fallecidos totales</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Fuente: Sociedad Chilena de Endocrinologia y Diabetes, reportes de salud pública y OMS.</p>
+        </div>
+    </div>
+</body>
+</html>

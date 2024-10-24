@@ -24,4 +24,7 @@ urlpatterns = [
     
     path('evaluacion-riesgo/', login_required(views.evaluacion_riesgo), name='evaluacion_riesgo'),
 
+     # Nueva ruta para generar el reporte PDF
+    path('reporte/', login_required(views.reporte_view), name='reporte'),  # Página del reporte visual con opción de descarga
+    path('descargar_reporte/', login_required(views.descargar_reporte), name='descargar_reporte'),  # Asegúrate de que esta línea esté presente
 ]

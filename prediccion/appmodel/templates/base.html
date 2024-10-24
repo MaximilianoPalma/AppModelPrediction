@@ -44,6 +44,14 @@
                     </div>
                 </div>
 
+                <div class="dropdown">
+                    <button class="dropbtn">Monitoreo</button>
+                    <div class="dropdown-content">
+                        <!-- Enlace que dirige al reporte visual -->
+                        <a href="{% url 'reporte' %}?rf_prediction={{ rf_prediction }}&svm_prediction={{ svm_prediction }}&logistic_prediction={{ logistic_prediction }}" class="btn">Generar Reporte</a>
+                    </div>
+                </div>
+                
                 <a href="#"> <button class="button primary dropbtn" >Soporte</button> </a>
 
             </ul>

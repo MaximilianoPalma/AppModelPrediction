@@ -1,9 +1,16 @@
+from io import BytesIO
 from django.shortcuts import render, redirect
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from appmodel.forms import CustomLoginForm
 from django.contrib.auth.decorators import login_required
 from .models import Paciente
 
+
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
+
+
+from django.http import HttpResponse
 from django.conf import settings
 import os
 import joblib
@@ -199,3 +206,61 @@ def evaluacion_riesgo(request):
             return render(request, 'consulta.html', {'error': 'Ocurrió un error durante la predicción.'})
 
     return render(request, 'consulta.html')
+
+
+
+
+
+#####ULTIMOS CAMBIOS DE AQUI EN ADELANTE####
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from django.http import HttpResponse
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .reporte_utils import calcular_datos_reporte
+
+
+@login_required
+def reporte_view(request):
+    # Calcular los datos del reporte en tiempo real
+    datos_reporte = calcular_datos_reporte()
+
+    # Contexto para enviar los datos al template
+    context = {
+        'promedio_diario': datos_reporte['promedio_diario'],
+        'total_semanal': datos_reporte['total_semanal'],
+        'casos_totales': datos_reporte['casos_totales'],
+        'nuevos_casos_diarios': datos_reporte['nuevos_casos_diarios'],
+        'nuevos_casos_semanales': datos_reporte['nuevos_casos_semanales'],
+        'test_realizados': datos_reporte['test_realizados'],
+        'fallecidos_totales': datos_reporte['fallecidos_totales'],
+        'fallecidos_semanales': datos_reporte['fallecidos_semanales'],
+    }
+
+    return render(request, 'reporte.html', context)
+
+@login_required
+def descargar_reporte(request):
+    # Crear un objeto HttpResponse con el tipo de contenido 'application/pdf'
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte_diabetes.pdf"'
+
+    # Crear el PDF utilizando ReportLab
+    pdf = canvas.Canvas(response, pagesize=letter)
+    pdf.drawString(100, 750, "Reporte de Casos de Diabetes en Chile")
+    
+    # Agregar datos del reporte obtenidos del contexto
+    pdf.drawString(100, 720, f"Promedio diario de casos: {request.GET.get('promedio_diario', '')}")
+    pdf.drawString(100, 700, f"Total semanal de casos: {request.GET.get('total_semanal', '')}")
+    pdf.drawString(100, 680, f"Total de casos acumulados: {request.GET.get('casos_totales', '')}")
+    pdf.drawString(100, 660, f"Nuevos casos diarios estimados: {request.GET.get('nuevos_casos_diarios', '')}")
+    pdf.drawString(100, 640, f"Nuevos casos semanales estimados: {request.GET.get('nuevos_casos_semanales', '')}")
+    pdf.drawString(100, 620, f"Test realizados: {request.GET.get('test_realizados', '')}")
+    pdf.drawString(100, 600, f"Fallecidos totales: {request.GET.get('fallecidos_totales', '')}")
+    pdf.drawString(100, 580, f"Fallecidos esta semana: {request.GET.get('fallecidos_semanales', '')}")
+
+    # Finalizar y devolver el PDF
+    pdf.showPage()
+    pdf.save()
+    return response
+

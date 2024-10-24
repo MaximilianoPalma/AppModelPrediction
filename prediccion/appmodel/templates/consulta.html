@@ -103,19 +103,23 @@
     </form>
 </div>
 
-<div class="form-register-container" id="container-resultados">
-    
-    <h2>Resultados</h2>
+<div class="container">
+    <h2>Resultados de la Predicción</h2>
 
+    <!-- Contenedor de predicciones con semáforo y recomendaciones -->
     <div class="predicciones-container">
-            
+        
         <!-- Predicción Random Forest -->
-        <div class="prediccion {% if rf_prediction > 60 %}semaforo-rojo{% elif rf_prediction > 30 %}semaforo-amarillo{% else %}semaforo-verde{% endif %}">
-            <p><strong>Random Forest:</strong> {{ rf_prediction|floatformat:2 }}%</p>
-            
-            <!-- Mostrar factores relevantes solo si la predicción es alta -->
+        <div class="prediccion">
+            <h4>Random Forest</h4>
+            <div class="semaforo-vertical">
+                <div class="circulo {% if rf_prediction <= 30 %}verde{% else %}apagado{% endif %}"></div>
+                <div class="circulo {% if rf_prediction > 30 and rf_prediction <= 60 %}amarillo{% else %}apagado{% endif %}"></div>
+                <div class="circulo {% if rf_prediction > 60 %}rojo{% else %}apagado{% endif %}"></div>
+            </div>
+            <p><strong>Riesgo Predicho:</strong> {{ rf_prediction|floatformat:2 }}%</p>
             {% if rf_prediction > 30 %}
-            <p><strong>Interpretación:</strong> Este porcentaje indica que el paciente tiene un riesgo de diabetes basado en los siguientes factores:</p>
+            <p><strong>Factores relevantes:</strong></p>
             <ul>
                 {% if blood_glucose_level > 125 %}
                 <li>Glucosa elevada (contribuye al riesgo)</li>
@@ -130,14 +134,30 @@
             {% else %}
             <p>El riesgo es bajo, mantén hábitos saludables para prevenir la enfermedad.</p>
             {% endif %}
+
+            <!-- Plan de acción específico para Random Forest -->
+            <div class="recomendacion">
+                <h4>Plan de Acción (Random Forest)</h4>
+                {% if blood_glucose_level > 125 %}
+                <p><strong>Glucosa elevada:</strong> Recomendamos una consulta con un endocrinólogo y un monitoreo diario de la glucosa.</p>
+                {% endif %}
+                {% if bmi > 25 %}
+                <p><strong>IMC alto:</strong> Se sugiere seguir una dieta balanceada y aumentar la actividad física.</p>
+                {% endif %}
+            </div>
         </div>
 
         <!-- Predicción SVM -->
-        <div class="prediccion {% if svm_prediction > 60 %}semaforo-rojo{% elif svm_prediction > 30 %}semaforo-amarillo{% else %}semaforo-verde{% endif %}">
-            <p><strong>Support Vector Machine:</strong> {{ svm_prediction|floatformat:2 }}%</p>
-            
+        <div class="prediccion">
+            <h4>Support Vector Machine</h4>
+            <div class="semaforo-vertical">
+                <div class="circulo {% if svm_prediction > 60 %}rojo{% else %}apagado{% endif %}"></div>
+                <div class="circulo {% if svm_prediction > 30 and svm_prediction <= 60 %}amarillo{% else %}apagado{% endif %}"></div>
+                <div class="circulo {% if svm_prediction <= 30 %}verde{% else %}apagado{% endif %}"></div>
+            </div>
+            <p><strong>Riesgo Predicho:</strong> {{ svm_prediction|floatformat:2 }}%</p>
             {% if svm_prediction > 30 %}
-            <p><strong>Interpretación:</strong> Este porcentaje refleja un riesgo moderado de diabetes, influenciado por los siguientes factores:</p>
+            <p><strong>Factores relevantes:</strong></p>
             <ul>
                 {% if blood_glucose_level > 125 %}
                 <li>Glucosa elevada</li>
@@ -149,14 +169,31 @@
             {% else %}
             <p>El riesgo es bajo, sigue con hábitos saludables.</p>
             {% endif %}
+
+            <!-- Plan de acción específico para SVM -->
+            <div class="recomendacion">
+                <h4>Plan de Acción (SVM)</h4>
+                {% if blood_glucose_level > 125 %}
+                <p><strong>Glucosa elevada:</strong> Controlar la ingesta de carbohidratos y consultar a un médico.</p>
+                {% endif %}
+                {% if hypertension %}
+                <p><strong>Hipertensión:</strong> Monitorear regularmente la presión arterial y reducir el consumo de sal.</p>
+                {% endif %}
+            </div>
         </div>
 
         <!-- Predicción Regresión Logística -->
-        <div class="prediccion {% if logistic_prediction > 60 %}semaforo-rojo{% elif logistic_prediction > 30 %}semaforo-amarillo{% else %}semaforo-verde{% endif %}">
-            <p><strong>Regresión Logística:</strong> {{ logistic_prediction|floatformat:2 }}%</p>
+        <div class="prediccion">
+            <h4>Regresión Logística</h4>
+            <div class="semaforo-vertical">
+                <div class="circulo {% if logistic_prediction <= 30 %}verde{% else %}apagado{% endif %}"></div>
+                <div class="circulo {% if logistic_prediction > 30 and logistic_prediction <= 60 %}amarillo{% else %}apagado{% endif %}"></div>
+                <div class="circulo {% if logistic_prediction > 60 %}rojo{% else %}apagado{% endif %}"></div>
+            </div>
+            <p><strong>Riesgo Predicho:</strong> {{ logistic_prediction|floatformat:2 }}%</p>
 
             {% if logistic_prediction > 30 %}
-            <p><strong>Interpretación:</strong> Este porcentaje indica un riesgo alto, basado en factores como:</p>
+            <p><strong>Factores relevantes:</strong></p>
             <ul>
                 {% if smoking_history == 'current' %}
                 <li>Historial de tabaquismo (fumador actual)</li>
@@ -168,35 +205,85 @@
             {% else %}
             <p>El riesgo es bajo. Continúa con hábitos saludables.</p>
             {% endif %}
+
+            <!-- Plan de acción específico para Regresión Logística -->
+            <div class="recomendacion">
+                <h4>Plan de Acción (Regresión Logística)</h4>
+                {% if smoking_history == 'current' %}
+                <p><strong>Tabaquismo:</strong> Considerar dejar de fumar y buscar apoyo médico.</p>
+                {% endif %}
+                {% if HbA1c_level > 6.5 %}
+                <p><strong>Nivel de HbA1c elevado:</strong> Controlar el nivel de azúcar en sangre con una dieta y medicamentos adecuados.</p>
+                {% endif %}
+            </div>
         </div>
-
-    </div>
-
-    <!-- Plan de Acción según Factores de Riesgo -->
-    <div class="recomendacion">
-        <h2>Plan de Acción según Factores de Riesgo:</h2>
-
-        {% if blood_glucose_level > 125 %}
-        <p><strong>Glucosa elevada:</strong> Se recomienda una dieta baja en carbohidratos, aumento de actividad física y consulta con un endocrinólogo.</p>
-        {% endif %}
-
-        {% if HbA1c_level > 6.5 %}
-        <p><strong>Niveles altos de HbA1c:</strong> Control estricto del azúcar en sangre y posibles cambios en el tratamiento. Se sugiere un control trimestral.</p>
-        {% endif %}
-
-        {% if hypertension %}
-        <p><strong>Hipertensión presente:</strong> Reducción del consumo de sal, control de la presión arterial y una dieta balanceada baja en grasas saturadas.</p>
-        {% endif %}
-    </div>
-
-    <div class="recomendacion">
-        {% if rf_prediction > 50 or svm_prediction > 50 or logistic_prediction > 50 %}
-        <p><strong>Recomendación:</strong> El riesgo de diabetes es alto. Se recomienda una evaluación médica.</p>
-        {% else %}
-        <p><strong>Recomendación:</strong> El riesgo de diabetes es bajo. Mantén hábitos saludables.</p>
-        {% endif %}
     </div>
 </div>
+
+<style>
+/* Estilos del contenedor general */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Estilos del semáforo vertical */
+.semaforo-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.circulo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: grey;
+    margin: 5px 0;
+}
+
+.verde {
+    background-color: #4CAF50;
+}
+
+.amarillo {
+    background-color: #FFEB3B;
+}
+
+.rojo {
+    background-color: #F44336;
+}
+
+.apagado {
+    background-color: grey;
+}
+
+/* Estilos de las predicciones */
+.prediccion {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.recomendacion {
+    background-color: #f0f4f8;
+    padding: 10px;
+    margin-top: 15px;
+    border-left: 5px solid #2196F3;
+    border-radius: 4px;
+}
+
+.recomendacion h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+</style>
+
 
 <script>
 function limpiarFormulario() {

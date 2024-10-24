@@ -1,79 +1,29 @@
-<!-- templates/informe.html -->
-{% extends 'base.html' %}
-
-{% block title %}Informe{% endblock %}
-
-{% block content %}
-
-<div class="form-register-container">
-    <h2>Búsqueda de paciente</h2>
-    <form action="{% url 'index' %}" method="post">
-        {% csrf_token %}
-
-        <div class="form-group">
-            <label for="rut">RUT:</label>
-            <input type="text" id="rut" name="rut" placeholder="Ingrese RUT" required>
+<!-- templates/reporte_visual.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Predicciones</title>
+    <link rel="stylesheet" href="{% static 'predictions/styles.css' %}">
+</head>
+<body>
+    <main>
+        <h1>Reporte de Predicción de Diabetes</h1>
+        
+        <!-- Visualización de las predicciones -->
+        <div class="reporte-visual">
+            <p><strong>Random Forest:</strong> {{ rf_prediction }}%</p>
+            <p><strong>Support Vector Machine (SVM):</strong> {{ svm_prediction }}%</p>
+            <p><strong>Regresión Logística:</strong> {{ logistic_prediction }}%</p>
         </div>
 
-        <div class="form-group">
-            <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" placeholder="Esperando resultados..." disabled>
+        <!-- Botón para descargar el PDF -->
+        <div class="descargar-reporte">
+            <a href="{% url 'reporte' %}?download=1&rf_prediction={{ rf_prediction }}&svm_prediction={{ svm_prediction }}&logistic_prediction={{ logistic_prediction }}" class="btn btn-primary">
+                Descargar Reporte en PDF
+            </a>
         </div>
-
-        <div class="form-group">
-            <label for="apellido">Apellido:</label>
-            <input type="text" id="apellido" name="apellido" placeholder="Esperando resultados..." disabled>
-        </div>
-
-        <button type="submit">Generar informe</button>
-
-    </form>
-
-</div>
-
-<div class="datagrid-container">
-    <div class="datagrid">
-        <table border="1">
-            <thead>
-                <tr>
-                    <th colspan="5">Últimos informes</th>
-                </tr>
-                <tr>
-                    <th>RUT</th>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Resultado</th>
-                    <th>Descargar informe</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Dato 1</td>
-                    <td>Dato 1</td>
-                    <td>Dato 1</td>
-                    <td>Dato 1</td>
-                    <td>Descargar</td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="5">
-                        <div id="paging">
-                            <ul>
-                                <li><a href="#"><span>Anterior</span></a></li>
-                                <li><a href="#" class="active"><span>1</span></a></li>
-                                <li><a href="#"><span>2</span></a></li>
-                                <li><a href="#"><span>3</span></a></li>
-                                <li><a href="#"><span>4</span></a></li>
-                                <li><a href="#"><span>5</span></a></li>
-                                <li><a href="#"><span>Siguiente</span></a></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
-</div>
-
-{% endblock %}
+    </main>
+</body>
+</html>
