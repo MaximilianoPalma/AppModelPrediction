@@ -1,29 +1,26 @@
-<!-- templates/reporte_visual.html -->
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte de Predicciones</title>
-    <link rel="stylesheet" href="{% static 'predictions/styles.css' %}">
-</head>
-<body>
-    <main>
-        <h1>Reporte de Predicción de Diabetes</h1>
-        
-        <!-- Visualización de las predicciones -->
-        <div class="reporte-visual">
-            <p><strong>Random Forest:</strong> {{ rf_prediction }}%</p>
-            <p><strong>Support Vector Machine (SVM):</strong> {{ svm_prediction }}%</p>
-            <p><strong>Regresión Logística:</strong> {{ logistic_prediction }}%</p>
-        </div>
+{% extends 'base.html' %}
 
-        <!-- Botón para descargar el PDF -->
-        <div class="descargar-reporte">
-            <a href="{% url 'reporte' %}?download=1&rf_prediction={{ rf_prediction }}&svm_prediction={{ svm_prediction }}&logistic_prediction={{ logistic_prediction }}" class="btn btn-primary">
-                Descargar Reporte en PDF
-            </a>
-        </div>
-    </main>
-</body>
-</html>
+{% block content %}
+<head>
+    <title>{{ page_title }}</title>
+</head>
+
+<div class="report-container">
+    <h2>Reporte de Predicción de Diabetes</h2>
+        
+    <!-- Visualización de las predicciones -->
+    <div class="report-container">
+        <p><strong>Random Forest:</strong> {{ rf_prediction }}%</p>
+        <p><strong>Support Vector Machine (SVM):</strong> {{ svm_prediction }}%</p>
+        <p><strong>Regresión Logística:</strong> {{ logistic_prediction }}%</p>
+    </div> 
+
+    <!-- Botón para descargar el PDF -->
+    <div class="download-report">
+        <a class="button" href="{% url 'descargar_reporte' %}?download=1&rf_prediction={{ rf_prediction }}&svm_prediction={{ svm_prediction }}&logistic_prediction={{ logistic_prediction }}">
+            Descargar Reporte en PDF
+        </a>
+    </div>
+</div>
+
+{% endblock %}

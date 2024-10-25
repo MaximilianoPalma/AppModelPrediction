@@ -337,8 +337,6 @@ nav ul {
 /* -------------------- FIN - Container de CONSULTA -------------------- */
 /* -------------------- FIN - Container de CONSULTA -------------------- */
 
-
-
 /* -------------------- INICIO - Container de APLICACION/REGISTRO -------------------- */
 /* -------------------- INICIO - Container de APLICACION/REGISTRO -------------------- */
 
@@ -583,8 +581,8 @@ nav ul {
     background-color: #0b7dda;
 }
 
-/* -------------------- INICIO - TABLA INDEX -------------------- */
-/* -------------------- INICIO - TABLA INDEX -------------------- */
+/* -------------------- INICIO - TABLA LISTADO -------------------- */
+/* -------------------- INICIO - TABLA LISTADO -------------------- */
 
 .datagrid-container {
     display: flex;
@@ -669,8 +667,8 @@ nav ul {
     background-color: #0b7dda;
 }
 
-/* -------------------- FIN - TABLA INDEX -------------------- */
-/* -------------------- FIN - TABLA INDEX -------------------- */
+/* -------------------- FIN - TABLA LISTADO -------------------- */
+/* -------------------- FIN - TABLA LISTADO -------------------- */
 
 /* -------------------- INICIO - PREDICCIONES -------------------- */
 /* -------------------- INICIO - PREDICCIONES -------------------- */
@@ -738,17 +736,167 @@ ul {
 /* -------------------- FIN - PREDICCIONES -------------------- */
 /* -------------------- FIN - PREDICCIONES -------------------- */
 
-/* -------------------- INICIO - SUBGRUPOS -------------------- */
-/* -------------------- INICIO - SUBGRUPOS -------------------- */
+/* -------------------- INICIO - CONSULTA -------------------- */
+/* -------------------- INICIO - CONSULTA -------------------- */
+
+/* Estilos del semáforo vertical */
+.semaforo-vertical {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 15px;
+}
+
+.circulo {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: grey;
+    margin: 5px 0;
+}
+
+.verde {
+    background-color: #4CAF50;
+}
+
+.amarillo {
+    background-color: #FFEB3B;
+}
+
+.rojo {
+    background-color: #F44336;
+}
+
+.apagado {
+    background-color: grey;
+}
+
+/* Estilos de las predicciones */
+.prediccion {
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.recomendacion {
+    background-color: #f0f4f8;
+    padding: 10px;
+    margin-top: 15px;
+    border-left: 5px solid #2196F3;
+    border-radius: 4px;
+}
+
+.recomendacion h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+/* -------------------- FIN - CONSULTA -------------------- */
+/* -------------------- FIN - CONSULTA -------------------- */
+
+/* -------------------- INICIO - REPORTE - INDEX -------------------- */
+/* -------------------- INICIO - REPORTE - INDEX -------------------- */
+
+.report-container {
+    background-color: white;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 30px auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+}
+
+.report-container h2 {
+    text-align: center;
+    color: #0066cc;
+    margin-bottom: 10px;
+}
+
+.report-container p {
+    text-align: left;
+    color: #000000;
+    margin-bottom: 5px;
+}
+
+.report-section {
+    margin-bottom: 5px;
+    padding: 5px;
+    background-color: #eceff1;
+    border-radius: 8px;
+}
+
+.report-section h4 {
+    background-color: #0b7dda;
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+.stats-container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 5px;
+}
+
+.report-stat {
+    text-align: center;
+    flex: 1;
+    padding: 5px;
+}
+
+.report-stat h3 {
+    font-size: 2em;
+    color: #0066cc;
+}
+
+.report-stat small {
+    display: block;
+    font-size: 14px;
+    color: #0066cc;
+}
+
+.report-footer {
+    text-align: center;
+    margin-top: 10px;
+    color: #000000;
+}
+
+.report-footer p {
+    text-align: center;
+    margin-top: 10px;
+    color: #000000;
+}
+
+.download-report {
+    text-align: center;
+    margin-top: 5px;
+}
+
+.report-container .button {
+    background-color: #0066cc;
+    color: white;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    text-decoration: none;
+    display: inline-block;
+    transition: background-color 0.3s ease;
+    margin: 10px auto 5px auto;
+}
+
+.report-container .button:hover {
+    background-color: #0b7dda;
+}
 
 
 
-/* -------------------- FIN - SUBGRUPOS -------------------- */
-/* -------------------- FIN - SUBGRUPOS -------------------- */
 
-
-
-
-
-/* -------------------- FIN - REPORTE -------------------- */
-/* -------------------- FIN - REPORTE -------------------- */
+/* -------------------- FIN - REPORTE - INDEX -------------------- */
+/* -------------------- FIN - REPORTE - INDEX -------------------- */

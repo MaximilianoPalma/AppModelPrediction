@@ -5,86 +5,60 @@
     <title>{{ page_title }}</title>
 </head>
 
-<div class="datagrid-container">
-    <div class="datagrid">
-        <table border="1">
-            <thead>
-                <tr>
-                    <th colspan="12">Ingresos recientes</th>
-                </tr>
-                <tr>
-                    <th>RUT</th>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Edad</th>
-                    <th>Nacimiento</th>
-                    <th>Género</th>
-                    <th>Índice de Masa Corporal</th>
-                    <th>Hipertensión</th>
-                    <th>Enfermedad Cardiaca</th>
-                    <th>Nivel HbA1c</th>
-                    <th>Nivel Glucosa</th>
-                    <th>Historial Tabaquismo</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for paciente in pacientes %}
-                <tr>
-                    <td>{{ paciente.rut }}</td>
-                    <td>{{ paciente.nombre }}</td>
-                    <td>{{ paciente.apellido }}</td>
-                    <td>{{ paciente.edad }}</td>
-                    <td>{{ paciente.nacimiento|date:"d-m-Y" }}</td>
-                    <td>
-                        {% if paciente.genero == 1 %}
-                            Hombre
-                        {% elif paciente.genero == 0 %}
-                            Mujer
-                        {% else %}
-                            Otro
-                        {% endif %}
-                    </td>
-                    <td>{{ paciente.bmi }}</td>
-                    <td>{{ paciente.hipertension|yesno:"Sí,No" }}</td>
-                    <td>{{ paciente.enfermedad_cardiaca|yesno:"Sí,No" }}</td>
-                    <td>{{ paciente.nivel_hba1c }}</td>
-                    <td>{{ paciente.nivel_glucosa }}</td>
-                    <td>
-                        {% if paciente.historial_tabaquismo == 0 %}
-                            Nunca
-                        {% elif paciente.historial_tabaquismo == 1 %}
-                            Ex-fumador
-                        {% elif paciente.historial_tabaquismo == 2 %}
-                            Fumador ocasional
-                        {% else %}
-                            Fumador habitual
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="12">No hay pacientes registrados</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="12">
-                        <div id="paging">
-                            <ul>
-                                <li><a href="#"><span>Anterior</span></a></li>
-                                <li><a href="#" class="active"><span>1</span></a></li>
-                                <li><a href="#"><span>2</span></a></li>
-                                <li><a href="#"><span>3</span></a></li>
-                                <li><a href="#"><span>4</span></a></li>
-                                <li><a href="#"><span>5</span></a></li>
-                                <li><a href="#"><span>Siguiente</span></a></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
+<div class="report-container">
+    <h2>Reporte de Casos de Diabetes en Chile</h2>
+
+    <!-- Casos confirmados -->
+    <div class="report-section">
+        <h4>Casos Confirmados</h4>
+        <div class="stats-container">
+            <div class="report-stat">
+                <h3>{{ promedio_diario }}</h3>
+                <small>Promedio diario de casos</small>
+            </div>
+            <div class="report-stat">
+                <h3>{{ total_semanal }}</h3>
+                <small>Total semanal de casos</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Laboratorio -->
+    <div class="report-section">
+        <h4>Laboratorio</h4>
+        <div class="stats-container">
+            <div class="report-stat">
+                <h3>{{ test_realizados }}</h3>
+                <small>Total de exámenes realizados</small>
+            </div>
+            <div class="report-stat">
+                <h3>{{ nuevos_casos_diarios }}</h3>
+                <small>Nuevos casos diarios estimados</small>
+            </div>
+            <div class="report-stat">
+                <h3>{{ nuevos_casos_semanales }}</h3>
+                <small>Nuevos casos semanales estimados</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Casos fallecidos -->
+    <div class="report-section">
+        <h4>Casos Fallecidos</h4>
+        <div class="stats-container">
+            <div class="report-stat">
+                <h3>{{ fallecidos_semanales }}</h3>
+                <small>Fallecidos reportados esta semana</small>
+            </div>
+            <div class="report-stat">
+                <h3>{{ fallecidos_totales }}</h3>
+                <small>Fallecidos totales</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="report-footer">
+        <p>Fuente: Sociedad Chilena de Endocrinologia y Diabetes, reportes de salud pública y OMS.</p>
     </div>
 </div>
 
