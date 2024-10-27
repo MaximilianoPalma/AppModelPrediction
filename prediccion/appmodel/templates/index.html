@@ -3,63 +3,205 @@
 {% block content %}
 <head>
     <title>{{ page_title }}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script>
+        function showTab(tabId) {
+            // Ocultar todas las secciones
+            var sections = document.querySelectorAll('.tab-content');
+            sections.forEach(function(section) {
+                section.style.display = 'none';
+            });
+
+            // Mostrar la sección activa
+            document.getElementById(tabId).style.display = 'block';
+
+            // Cambiar el estado de las pestañas
+            var tabs = document.querySelectorAll('.tab');
+            tabs.forEach(function(tab) {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabId + '-tab').classList.add('active');
+        }
+
+        function downloadReport() {
+            html2canvas(document.querySelector(".report-container")).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.href = imgData;
+                link.download = 'reporte_diabetes.png'; // Nombre del archivo
+                link.click(); // Inicia la descarga
+            });
+        }
+    </script>
+    <style>
+        .tab {
+            padding: 10px;
+            cursor: pointer;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 5px;
+            background-color: #eceff1;
+        }
+
+        .tab.active {
+            background-color: #37474f;
+            color: white;
+        }
+
+        .image-container {
+            position: relative;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .nav-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #37474f;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .nav-button.left {
+            left: 10px;
+        }
+
+        .nav-button.right {
+            right: 10px;
+        }
+    </style>
 </head>
 
 <div class="report-container">
     <h2>Reporte de Casos de Diabetes en Chile</h2>
 
-    <!-- Casos confirmados -->
-    <div class="report-section">
-        <h4>Casos Confirmados</h4>
-        <div class="stats-container">
-            <div class="report-stat">
-                <h3>{{ promedio_diario }}</h3>
-                <small>Promedio diario de casos</small>
+    <!-- Pestañas -->
+    <div>
+        <div id="cifras-oficiales-tab" class="tab active" onclick="showTab('cifras-oficiales')">Cifras Oficiales</div>
+        <div id="reportes-e-informes-tab" class="tab" onclick="showTab('reportes-e-informes')">Reportes e Informes</div>
+        <div id="datos-historicos-tab" class="tab" onclick="showTab('datos-historicos')">Datos Históricos Diabetes Global</div>
+        <div id="descarga-datos-tab" class="tab" onclick="showTab('descarga-datos')">Descarga de Datos</div>
+    </div>
+
+    <!-- Contenido de la pestaña "Cifras Oficiales" -->
+    <div id="cifras-oficiales" class="tab-content">
+        <!-- Casos confirmados -->
+        <div class="report-section">
+            <h4>Casos Confirmados</h4>
+            <div class="stats-container">
+                <div class="report-stat">
+                    <h3>{{ promedio_diario }}</h3>
+                    <small>Promedio diario de casos</small>
+                </div>
+                <div class="report-stat">
+                    <h3>{{ total_semanal }}</h3>
+                    <small>Total semanal de casos</small>
+                </div>
             </div>
-            <div class="report-stat">
-                <h3>{{ total_semanal }}</h3>
-                <small>Total semanal de casos</small>
+        </div>
+
+        <!-- Laboratorio -->
+        <div class="report-section">
+            <h4>Laboratorio</h4>
+            <div class="stats-container">
+                <div class="report-stat">
+                    <h3>{{ test_realizados }}</h3>
+                    <small>Total de exámenes realizados</small>
+                </div>
+                <div class="report-stat">
+                    <h3>{{ nuevos_casos_diarios }}</h3>
+                    <small>Nuevos casos diarios estimados</small>
+                </div>
+                <div class="report-stat">
+                    <h3>{{ nuevos_casos_semanales }}</h3>
+                    <small>Nuevos casos semanales estimados</small>
+                </div>
             </div>
+        </div>
+
+        <!-- Casos fallecidos -->
+        <div class="report-section">
+            <h4>Casos Fallecidos</h4>
+            <div class="stats-container">
+                <div class="report-stat">
+                    <h3>{{ fallecidos_semanales }}</h3>
+                    <small>Fallecidos reportados esta semana</small>
+                </div>
+                <div class="report-stat">
+                    <h3>{{ fallecidos_totales }}</h3>
+                    <small>Fallecidos totales</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="report-footer">
+            <p>Fuente: Sociedad Chilena de Endocrinologia y Diabetes, reportes de salud pública y OMS.</p>
+            <button onclick="downloadReport()">Descargar Reporte</button>
         </div>
     </div>
 
-    <!-- Laboratorio -->
-    <div class="report-section">
-        <h4>Laboratorio</h4>
-        <div class="stats-container">
-            <div class="report-stat">
-                <h3>{{ test_realizados }}</h3>
-                <small>Total de exámenes realizados</small>
-            </div>
-            <div class="report-stat">
-                <h3>{{ nuevos_casos_diarios }}</h3>
-                <small>Nuevos casos diarios estimados</small>
-            </div>
-            <div class="report-stat">
-                <h3>{{ nuevos_casos_semanales }}</h3>
-                <small>Nuevos casos semanales estimados</small>
-            </div>
-        </div>
+    <!-- Pestaña vacía "Reportes e Informes" -->
+    <div id="reportes-e-informes" class="tab-content" style="display:none;">
+        <h4>Reportes e Informes</h4>
+        <p>Esta sección está vacía por ahora.</p>
     </div>
 
-    <!-- Casos fallecidos -->
-    <div class="report-section">
-        <h4>Casos Fallecidos</h4>
-        <div class="stats-container">
-            <div class="report-stat">
-                <h3>{{ fallecidos_semanales }}</h3>
-                <small>Fallecidos reportados esta semana</small>
-            </div>
-            <div class="report-stat">
-                <h3>{{ fallecidos_totales }}</h3>
-                <small>Fallecidos totales</small>
-            </div>
+    <!-- Pestaña "Datos Históricos" -->
+    <div id="datos-historicos" class="tab-content" style="display:none;">
+        <h4>Datos Históricos</h4>
+
+        <div class="image-container">
+            <h3 id="image-title">Distribución de Edad</h3>
+            <img id="image" src="{% load static %}{% static 'edad.png' %}" alt="Gráfico de Edad">
+            <button class="nav-button left" onclick="prevImage()">&#10094;</button>
+            <button class="nav-button right" onclick="nextImage()">&#10095;</button>
         </div>
+
     </div>
 
-    <div class="report-footer">
-        <p>Fuente: Sociedad Chilena de Endocrinologia y Diabetes, reportes de salud pública y OMS.</p>
+    <!-- Pestaña vacía "Descarga de Datos" -->
+    <div id="descarga-datos" class="tab-content" style="display:none;">
+        <h4>Descarga de Datos</h4>
+        <p>Esta sección está vacía por ahora.</p>
     </div>
+
+    <script>
+        // Array de imágenes y títulos
+        const images = [
+            { src: "{% load static %}{% static 'mapadiabetes.png' %}", title: "Mapa Diabetes Global" },
+            { src: "{% load static %}{% static 'edad.png' %}", title: "Distribución de Edad" },
+            { src: "{% load static %}{% static 'glucosa.png' %}", title: "Nivel de Glucosa" },
+            { src: "{% load static %}{% static 'hemoglobina.png' %}", title: "Hemoglobina Glicosilada" }
+        ];
+        let currentImageIndex = 0;
+
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % images.length; // Ciclo a través de las imágenes
+            updateImage();
+        }
+
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + images.length) % images.length; // Ciclo a través de las imágenes
+            updateImage();
+        }
+
+        function updateImage() {
+            document.getElementById('image').src = images[currentImageIndex].src;
+            document.getElementById('image-title').innerText = images[currentImageIndex].title;
+        }
+    </script>
+
 </div>
 
 {% endblock %}

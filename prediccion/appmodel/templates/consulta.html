@@ -151,9 +151,9 @@
         <div class="prediccion">
             <h4>Support Vector Machine</h4>
             <div class="semaforo-vertical">
-                <div class="circulo {% if svm_prediction > 60 %}rojo{% else %}apagado{% endif %}"></div>
-                <div class="circulo {% if svm_prediction > 30 and svm_prediction <= 60 %}amarillo{% else %}apagado{% endif %}"></div>
                 <div class="circulo {% if svm_prediction <= 30 %}verde{% else %}apagado{% endif %}"></div>
+                <div class="circulo {% if svm_prediction > 30 and svm_prediction <= 60 %}amarillo{% else %}apagado{% endif %}"></div>
+                <div class="circulo {% if svm_prediction > 60 %}rojo{% else %}apagado{% endif %}"></div>
             </div>
             <p><strong>Riesgo Predicho:</strong> {{ svm_prediction|floatformat:2 }}%</p>
             {% if svm_prediction > 30 %}

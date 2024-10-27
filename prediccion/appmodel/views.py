@@ -1,11 +1,10 @@
-from io import BytesIO
 from django.shortcuts import render, redirect
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from appmodel.forms import CustomLoginForm
 from django.contrib.auth.decorators import login_required
 from .models import Paciente
 
-from reportlab.pdfgen import canvas
+
 from django.http import HttpResponse
 
 from django.conf import settings
@@ -13,13 +12,26 @@ import os
 import joblib
 import numpy as np
 import pandas as pd
-from sklearn.preprocessing import StandardScaler
 
 from reportlab.lib.pagesizes import letter
 from .reporte_utils import calcular_datos_reporte
 
 import requests
 from bs4 import BeautifulSoup
+
+
+
+
+
+# views.py
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from django.http import HttpResponse
+from django.shortcuts import render
+from io import BytesIO
+import base64
 
 @login_required
 def base(request):
@@ -229,29 +241,32 @@ def evaluacion_riesgo(request):
 
     return render(request, 'consulta.html')
 
+
+
+from django.http import HttpResponse
+from PIL import Image, ImageDraw
 @login_required
 def descargar_reporte(request):
-    # Crear un objeto HttpResponse con el tipo de contenido 'application/pdf'
-    response = HttpResponse(content_type='application/pdf')
-    response['Content-Disposition'] = 'attachment; filename="reporte_diabetes.pdf"'
+    # Crear una imagen en blanco
+    width, height = 800, 600
+    img = Image.new('RGB', (width, height), color=(255, 255, 255))
+    d = ImageDraw.Draw(img)
 
-    # Crear el PDF utilizando ReportLab
-    pdf = canvas.Canvas(response, pagesize=letter)
-    pdf.drawString(100, 750, "Reporte de Casos de Diabetes en Chile")
-    
-    # Agregar datos del reporte obtenidos del contexto
-    pdf.drawString(100, 720, f"Promedio diario de casos: {request.GET.get('promedio_diario', '')}")
-    pdf.drawString(100, 700, f"Total semanal de casos: {request.GET.get('total_semanal', '')}")
-    pdf.drawString(100, 680, f"Total de casos acumulados: {request.GET.get('casos_totales', '')}")
-    pdf.drawString(100, 660, f"Nuevos casos diarios estimados: {request.GET.get('nuevos_casos_diarios', '')}")
-    pdf.drawString(100, 640, f"Nuevos casos semanales estimados: {request.GET.get('nuevos_casos_semanales', '')}")
-    pdf.drawString(100, 620, f"Test realizados: {request.GET.get('test_realizados', '')}")
-    pdf.drawString(100, 600, f"Fallecidos totales: {request.GET.get('fallecidos_totales', '')}")
-    pdf.drawString(100, 580, f"Fallecidos esta semana: {request.GET.get('fallecidos_semanales', '')}")
+    # Títulos y datos del reporte
+    d.text((10, 10), "Reporte de Casos de Diabetes en Chile", fill=(0, 0, 0))
+    d.text((10, 50), f"Promedio diario de casos: {request.GET.get('promedio_diario', 'N/A')}", fill=(0, 0, 0))
+    d.text((10, 70), f"Total semanal de casos: {request.GET.get('total_semanal', 'N/A')}", fill=(0, 0, 0))
+    d.text((10, 90), f"Total de exámenes realizados: {request.GET.get('test_realizados', 'N/A')}", fill=(0, 0, 0))
+    d.text((10, 110), f"Nuevos casos diarios: {request.GET.get('nuevos_casos_diarios', 'N/A')}", fill=(0, 0, 0))
+    d.text((10, 130), f"Nuevos casos semanales: {request.GET.get('nuevos_casos_semanales', 'N/A')}", fill=(0, 0, 0))
+    d.text((10, 150), f"Fallecidos reportados esta semana: {request.GET.get('fallecidos_semanales', 'N/A')}", fill=(0, 0, 0))
+    d.text((10, 170), f"Fallecidos totales: {request.GET.get('fallecidos_totales', 'N/A')}", fill=(0, 0, 0))
 
-    # Finalizar y devolver el PDF
-    pdf.showPage()
-    pdf.save()
+    # Guardar la imagen en un objeto BytesIO
+    response = HttpResponse(content_type='image/png')
+    response['Content-Disposition'] = 'attachment; filename="reporte_diabetes.png"'
+    img.save(response, 'PNG')
+
     return response
 
 def generar_reporte_vista():
@@ -345,3 +360,88 @@ def calcular_datos_reporte():
         'fallecidos_totales': fallecidos_totales,
         'fallecidos_semanales': fallecidos_semanales,
     }
+
+
+from django.shortcuts import render
+import pandas as pd
+import matplotlib.pyplot as plt
+from django.http import HttpResponse
+from django.conf import settings
+import os
+
+@login_required
+def generar_graficos(request):
+    try:
+        # Ruta al archivo CSV
+        data_path = os.path.join(settings.BASE_DIR, 'appmodel', 'algoritmos', 'diabetes_prediction_dataset.csv')
+        
+        # Leer el archivo CSV
+        df = pd.read_csv(data_path)
+
+        # Gráfico de distribución de edad
+        plt.figure(figsize=(10, 5))
+        plt.hist(df['age'], bins=30, color='blue', alpha=0.7)
+        plt.title('Distribución de Edad de Pacientes con Diabetes')
+        plt.xlabel('Edad')
+        plt.ylabel('Número de Pacientes')
+        edad_grafico_path = os.path.join(settings.STATIC_ROOT, 'grafico_edad.png')
+        plt.savefig(edad_grafico_path)
+        plt.close()
+
+        # Gráfico de nivel de glucosa
+        plt.figure(figsize=(10, 5))
+        plt.hist(df['blood_glucose_level'], bins=30, color='green', alpha=0.7)
+        plt.title('Distribución de Nivel de Glucosa de Pacientes con Diabetes')
+        plt.xlabel('Nivel de Glucosa')
+        plt.ylabel('Número de Pacientes')
+        glucosa_grafico_path = os.path.join(settings.STATIC_ROOT, 'grafico_glucosa.png')
+        plt.savefig(glucosa_grafico_path)
+        plt.close()
+
+        # Renderizar la plantilla
+        return render(request, 'tu_template.html', {
+            'grafico_edad': 'static/grafico_edad.png',
+            'grafico_glucosa': 'static/grafico_glucosa.png',
+        })
+    except Exception as e:
+        return HttpResponse(f"Error al generar los gráficos: {str(e)}", status=500)
+
+
+
+
+
+from django.http import HttpResponse
+from PIL import Image, ImageDraw, ImageFont
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def descargar_reporte(request):
+    # Crear una imagen en blanco
+    width, height = 800, 600
+    img = Image.new('RGB', (width, height), color=(255, 255, 255))
+    d = ImageDraw.Draw(img)
+
+    # Establecer una fuente
+    try:
+        font = ImageFont.truetype("arial.ttf", 20)
+    except IOError:
+        font = ImageFont.load_default()
+
+    # Títulos y datos del reporte
+    d.text((10, 10), "Reporte de Casos de Diabetes en Chile", fill=(0, 0, 0), font=font)
+    d.text((10, 50), f"Promedio diario de casos: {request.GET.get('promedio_diario', 'N/A')}", fill=(0, 0, 0), font=font)
+    d.text((10, 70), f"Total semanal de casos: {request.GET.get('total_semanal', 'N/A')}", fill=(0, 0, 0), font=font)
+    d.text((10, 90), f"Total de exámenes realizados: {request.GET.get('test_realizados', 'N/A')}", fill=(0, 0, 0), font=font)
+    d.text((10, 110), f"Nuevos casos diarios: {request.GET.get('nuevos_casos_diarios', 'N/A')}", fill=(0, 0, 0), font=font)
+    d.text((10, 130), f"Nuevos casos semanales: {request.GET.get('nuevos_casos_semanales', 'N/A')}", fill=(0, 0, 0), font=font)
+    d.text((10, 150), f"Fallecidos reportados esta semana: {request.GET.get('fallecidos_semanales', 'N/A')}", fill=(0, 0, 0), font=font)
+    d.text((10, 170), f"Fallecidos totales: {request.GET.get('fallecidos_totales', 'N/A')}", fill=(0, 0, 0), font=font)
+
+    # Guardar la imagen en un objeto BytesIO
+    response = HttpResponse(content_type='image/png')
+    response['Content-Disposition'] = 'attachment; filename="reporte_diabetes.png"'
+    img.save(response, 'PNG')
+
+    return response
+
+
