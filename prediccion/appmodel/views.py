@@ -4,14 +4,11 @@ from appmodel.forms import CustomLoginForm
 from django.contrib.auth.decorators import login_required
 from .models import Paciente
 
-
 from django.http import HttpResponse
 
 from django.conf import settings
-import os
 import joblib
 import numpy as np
-import pandas as pd
 
 from reportlab.lib.pagesizes import letter
 from .reporte_utils import calcular_datos_reporte
@@ -19,19 +16,14 @@ from .reporte_utils import calcular_datos_reporte
 import requests
 from bs4 import BeautifulSoup
 
-
-
-
-
-# views.py
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from django.http import HttpResponse
-from django.shortcuts import render
 from io import BytesIO
 import base64
+
+from PIL import Image, ImageDraw, ImageFont
 
 @login_required
 def base(request):
@@ -241,10 +233,6 @@ def evaluacion_riesgo(request):
 
     return render(request, 'consulta.html')
 
-
-
-from django.http import HttpResponse
-from PIL import Image, ImageDraw
 @login_required
 def descargar_reporte(request):
     # Crear una imagen en blanco
@@ -361,14 +349,6 @@ def calcular_datos_reporte():
         'fallecidos_semanales': fallecidos_semanales,
     }
 
-
-from django.shortcuts import render
-import pandas as pd
-import matplotlib.pyplot as plt
-from django.http import HttpResponse
-from django.conf import settings
-import os
-
 @login_required
 def generar_graficos(request):
     try:
@@ -406,14 +386,6 @@ def generar_graficos(request):
     except Exception as e:
         return HttpResponse(f"Error al generar los gráficos: {str(e)}", status=500)
 
-
-
-
-
-from django.http import HttpResponse
-from PIL import Image, ImageDraw, ImageFont
-from django.contrib.auth.decorators import login_required
-
 @login_required
 def descargar_reporte(request):
     # Crear una imagen en blanco
@@ -443,5 +415,3 @@ def descargar_reporte(request):
     img.save(response, 'PNG')
 
     return response
-
-

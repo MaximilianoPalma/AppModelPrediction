@@ -22,7 +22,6 @@ urlpatterns = [
     
     path('evaluacion-riesgo/', login_required(views.evaluacion_riesgo), name='evaluacion_riesgo'),
 
-    # Nueva ruta para generar el reporte PDF
     path('descargar-reporte/', views.descargar_reporte, name='descargar_reporte'),
 
     path('graficos/', login_required(views.generar_graficos), name='graficos'),
