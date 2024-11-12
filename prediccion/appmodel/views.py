@@ -415,3 +415,9 @@ def descargar_reporte(request):
     img.save(response, 'PNG')
 
     return response
+
+def registro_soporte(request):
+    return render(request, 'registro_soporte.html')
+
+def listado_soporte(request):
+    pass

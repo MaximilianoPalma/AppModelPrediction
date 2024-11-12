@@ -11,7 +11,6 @@ urlpatterns = [
     path('index/', login_required(views.index), name='index'),
     
     path('listado/', login_required(views.listado_pacientes), name='listado_pacientes'),
-    
     path('registro/', views.registro_paciente, name='registro_paciente'),
     path('consulta/', views.consulta_paciente, name='consulta_paciente'),   
 
@@ -19,6 +18,7 @@ urlpatterns = [
     path('informe/', login_required(views.informe), name='informe'),
 
     path('soporte/', login_required(views.soporte), name='soporte'),
+    path('registro_soporte/', views.registro_soporte, name='registro_soporte'),
     
     path('evaluacion-riesgo/', login_required(views.evaluacion_riesgo), name='evaluacion_riesgo'),
 

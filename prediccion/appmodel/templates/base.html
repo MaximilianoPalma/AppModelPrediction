@@ -48,7 +48,13 @@
                     </div>
                 </div>
 
-                <a href="#"> <button class="button primary dropbtn" >Soporte</button> </a>
+                <div class="dropdown">
+                    <button class="dropbtn" >Soporte</button>
+                    <div class="dropdown-content">
+                      <a href="{% url 'registro_soporte' %}">Registro</a>
+                      <a href="{% url 'registro_soporte' %}">Listado soporte</a>
+                    </div>
+                </div>
 
             </ul>
         </nav>

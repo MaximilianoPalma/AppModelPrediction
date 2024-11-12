@@ -197,6 +197,7 @@ nav ul {
 
 .form-register-container input[type="text"],
 .form-register-container input[type="number"],
+.form-register-container input[type="password"],
 .form-register-container select {
     width: 100%;
     padding: 8px;
