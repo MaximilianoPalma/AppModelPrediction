@@ -1,13 +1,13 @@
 <!-- templates/registro.html -->
 {% extends 'base.html' %}
 
-{% block title %}Registro{% endblock %}
+{% block title %}Registro soporte{% endblock %}
 
 {% block content %}
 
 <div class="form-register-container">
-    <h2>Datos</h2>
-    <form action="{% url 'registro_soporte' %}" method="post">
+    <h2>Datos usuario</h2>
+    <form action="{% url 'registro_soporte' %}" method="post" id="registroForm">
         {% csrf_token %}
 
         <div class="form-group">
@@ -35,8 +35,25 @@
             <input type="password" id="sop_password" name="sop_password" placeholder="Ingrese contraseña" required>
         </div>
 
+        <div class="form-group">
+            <label for="sop_password_confirmacion">Repetir contraseña:</label>
+            <input type="password" id="sop_password_confirmacion" name="sop_password_confirmacion" placeholder="Ingrese nuevamente" required>
+        </div>
+
         <button type="submit">Registrar datos</button>
     </form>
 </div>
+
+<script>
+    document.getElementById('registroForm').addEventListener('submit', function(event) {
+        var password = document.getElementById('sop_password').value;
+        var confirmPassword = document.getElementById('sop_password_confirmacion').value;
+
+        if (password !== confirmPassword) {
+            alert('Las contraseñas no coinciden.');
+            event.preventDefault();
+        }
+    });
+</script>
 
 {% endblock %}
