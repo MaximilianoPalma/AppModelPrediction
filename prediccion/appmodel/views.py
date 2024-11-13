@@ -25,6 +25,10 @@ import base64
 
 from PIL import Image, ImageDraw, ImageFont
 
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.contrib.auth.hashers import make_password
+
 @login_required
 def base(request):
     return render(request, 'base.html')
@@ -417,7 +421,35 @@ def descargar_reporte(request):
     return response
 
 def registro_soporte(request):
-    return render(request, 'registro_soporte.html')
+    if request.method == "POST":
+        nombre = request.POST.get("sop_nombre")
+        apellido = request.POST.get("sop_apellido")
+        correo = request.POST.get("sop_correo")
+        usuario = request.POST.get("sop_usuario")
+        password = request.POST.get("sop_password")
+        password_confirmacion = request.POST.get("sop_password_confirmacion")
+
+        if password == password_confirmacion:
+            try:
+                user = User.objects.create(
+                    username=usuario,
+                    first_name=nombre,
+                    last_name=apellido,
+                    email=correo,
+                    password=make_password(password),
+                    is_staff=True,
+                    is_active=True
+                )
+                user.save()
+                messages.success(request, "Usuario creado exitosamente.")
+                return redirect("index")
+            except Exception as e:
+                messages.error(request, f"Error al crear el usuario: {e}")
+        else:
+            messages.error(request, "Las contraseñas no coinciden.")
+
+    return render(request, "registro_soporte.html")
 
 def listado_soporte(request):
-    pass
+    usuarios_soporte = User.objects.filter(is_staff=True)
+    return render(request, 'listado_soporte.html', {'usuarios_soporte': usuarios_soporte})

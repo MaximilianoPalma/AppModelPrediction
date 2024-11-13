@@ -19,6 +19,7 @@ urlpatterns = [
 
     path('soporte/', login_required(views.soporte), name='soporte'),
     path('registro_soporte/', views.registro_soporte, name='registro_soporte'),
+    path('listado_soporte/', views.listado_soporte, name='listado_soporte'),
     
     path('evaluacion-riesgo/', login_required(views.evaluacion_riesgo), name='evaluacion_riesgo'),
 
