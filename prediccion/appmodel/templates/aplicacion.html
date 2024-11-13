@@ -6,7 +6,7 @@
 <div class="tab-container">
 
     <h2>Análisis de Paciente NO Registrado</h2>
-    <form action="{% url 'index' %}" method="post">
+    <form action="{% url 'aplicacion' %}" method="post">
         {% csrf_token %}
     
         <div class="tab-group">
@@ -89,21 +89,165 @@
         </div>
     
         <div class="button-group">
-            <button type="submit">Análisis y registro</button>
-            <button type="submit">Solo análisis</button>
+            <button type="submit" name="action" value="guardar_analisis">Análisis y registro</button>
+            <button type="submit" name="action" value="analisis">Solo análisis</button>
+            <button type="button" onclick="limpiarFormulario()">Limpiar datos</button>
         </div>
+
     </form>
-    
- </div>
+</div>
+
+<div class="form-register-container">
+    <h2>Resultados de la Predicción</h2>
+
+    <div class="predicciones-container">
+        
+        <!-- Predicción Random Forest -->
+        <div class="prediccion">
+            <h4>Random Forest</h4>
+            <div class="semaforo-vertical">
+                <div class="circulo {% if rf_prediction <= 30 %}verde{% else %}apagado{% endif %}"></div>
+                <div class="circulo {% if rf_prediction > 30 and rf_prediction <= 60 %}amarillo{% else %}apagado{% endif %}"></div>
+                <div class="circulo {% if rf_prediction > 60 %}rojo{% else %}apagado{% endif %}"></div>
+            </div>
+            <p><strong>Riesgo Predicho:</strong> {{ rf_prediction|floatformat:2 }}%</p>
+            {% if rf_prediction > 30 %}
+            <p><strong>Factores relevantes:</strong></p>
+            <ul>
+                {% if blood_glucose_level > 125 %}
+                <li>Glucosa elevada (contribuye al riesgo)</li>
+                {% endif %}
+                {% if bmi > 25 %}
+                <li>IMC alto (sobrepeso u obesidad)</li>
+                {% endif %}
+                {% if age > 60 %}
+                <li>Edad avanzada</li>
+                {% endif %}
+            </ul>
+            {% else %}
+            <p>El riesgo es bajo, mantén hábitos saludables para prevenir la enfermedad.</p>
+            {% endif %}
+
+            <!-- Plan de acción específico para Random Forest -->
+            <div class="recomendacion">
+                <h4>Plan de Acción (Random Forest)</h4>
+                {% if blood_glucose_level > 125 %}
+                <p><strong>Glucosa elevada:</strong> Recomendamos una consulta con un endocrinólogo y un monitoreo diario de la glucosa.</p>
+                {% endif %}
+                {% if bmi > 25 %}
+                <p><strong>IMC alto:</strong> Se sugiere seguir una dieta balanceada y aumentar la actividad física.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Predicción SVM -->
+        <div class="prediccion">
+            <h4>Support Vector Machine</h4>
+            <div class="semaforo-vertical">
+                <div class="circulo {% if svm_prediction <= 30 %}verde{% else %}apagado{% endif %}"></div>
+                <div class="circulo {% if svm_prediction > 30 and svm_prediction <= 60 %}amarillo{% else %}apagado{% endif %}"></div>
+                <div class="circulo {% if svm_prediction > 60 %}rojo{% else %}apagado{% endif %}"></div>
+            </div>
+            <p><strong>Riesgo Predicho:</strong> {{ svm_prediction|floatformat:2 }}%</p>
+            {% if svm_prediction > 30 %}
+            <p><strong>Factores relevantes:</strong></p>
+            <ul>
+                {% if blood_glucose_level > 125 %}
+                <li>Glucosa elevada</li>
+                {% endif %}
+                {% if hypertension %}
+                <li>Hipertensión</li>
+                {% endif %}
+            </ul>
+            {% else %}
+            <p>El riesgo es bajo, sigue con hábitos saludables.</p>
+            {% endif %}
+
+            <!-- Plan de acción específico para SVM -->
+            <div class="recomendacion">
+                <h4>Plan de Acción (SVM)</h4>
+                {% if blood_glucose_level > 125 %}
+                <p><strong>Glucosa elevada:</strong> Controlar la ingesta de carbohidratos y consultar a un médico.</p>
+                {% endif %}
+                {% if hypertension %}
+                <p><strong>Hipertensión:</strong> Monitorear regularmente la presión arterial y reducir el consumo de sal.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Predicción Regresión Logística -->
+        <div class="prediccion">
+            <h4>Regresión Logística</h4>
+            <div class="semaforo-vertical">
+                <div class="circulo {% if logistic_prediction <= 30 %}verde{% else %}apagado{% endif %}"></div>
+                <div class="circulo {% if logistic_prediction > 30 and logistic_prediction <= 60 %}amarillo{% else %}apagado{% endif %}"></div>
+                <div class="circulo {% if logistic_prediction > 60 %}rojo{% else %}apagado{% endif %}"></div>
+            </div>
+            <p><strong>Riesgo Predicho:</strong> {{ logistic_prediction|floatformat:2 }}%</p>
+
+            {% if logistic_prediction > 30 %}
+            <p><strong>Factores relevantes:</strong></p>
+            <ul>
+                {% if smoking_history == 'current' %}
+                <li>Historial de tabaquismo (fumador actual)</li>
+                {% endif %}
+                {% if HbA1c_level > 6.5 %}
+                <li>Niveles elevados de HbA1c</li>
+                {% endif %}
+            </ul>
+            {% else %}
+            <p>El riesgo es bajo. Continúa con hábitos saludables.</p>
+            {% endif %}
+
+            <!-- Plan de acción específico para Regresión Logística -->
+            <div class="recomendacion">
+                <h4>Plan de Acción (Regresión Logística)</h4>
+                {% if smoking_history == 'current' %}
+                <p><strong>Tabaquismo:</strong> Considerar dejar de fumar y buscar apoyo médico.</p>
+                {% endif %}
+                {% if HbA1c_level > 6.5 %}
+                <p><strong>Nivel de HbA1c elevado:</strong> Controlar el nivel de azúcar en sangre con una dieta y medicamentos adecuados.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
-
     $(function() {
         $("#nacimiento").datepicker({
             dateFormat: "dd-mm-yy"
         });
     });
 
+    document.querySelector("form").addEventListener("submit", function(event) {
+        let nacimientoField = document.getElementById("nacimiento");
+        let fechaNacimiento = nacimientoField.value;
+
+        if (fechaNacimiento) {
+            let partes = fechaNacimiento.split("-");
+            let fechaFormateada = `${partes[2]}-${partes[1]}-${partes[0]}`;
+            nacimientoField.value = fechaFormateada;
+        }
+    });
+
+    function limpiarFormulario() {
+        document.getElementById('rut').value = '';
+        document.getElementById('nombre').value = '';
+        document.getElementById('apellido').value = '';
+        document.getElementById('rut_hidden').value = '';
+        document.getElementById('age').value = '';
+        document.getElementById('gender').selectedIndex = 0;
+        document.getElementById('bmi').value = '';
+        document.getElementById('hypertension').selectedIndex = 0;
+        document.getElementById('heart_disease').selectedIndex = 0;
+        document.getElementById('hba1c_level').value = '';
+        document.getElementById('blood_glucose_level').value = '';
+        document.getElementById('smoking_history').selectedIndex = 0;
+        document.getElementById('nacimiento').value = '';
+        document.getElementById('resultados-prediccion').innerHTML = '';
+    }
 </script>
 
 {% endblock %}

@@ -118,9 +118,93 @@ def consulta_paciente(request):
 
     return render(request, 'consulta.html', {'paciente': paciente})
 
-
 @login_required
 def aplicacion(request):
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        try:
+            rut = request.POST['rut']
+            nombre = request.POST['nombre']
+            apellido = request.POST['apellido']
+            age = request.POST.get('age')
+            nacimiento = request.POST['nacimiento']
+            gender = request.POST.get('gender')
+            hypertension = request.POST.get('hypertension')
+            heart_disease = request.POST.get('heart_disease')
+            smoking_history = request.POST.get('smoking_history')
+            bmi = request.POST.get('bmi')
+            hba1c_level = request.POST.get('hba1c_level')
+            blood_glucose_level = request.POST.get('blood_glucose_level')
+
+            if not all([age, gender, hypertension, heart_disease, smoking_history, bmi, hba1c_level, blood_glucose_level]):
+                raise ValueError("Todos los campos son obligatorios.")
+
+            age = int(age)
+            hypertension = int(hypertension)
+            heart_disease = int(heart_disease)
+            bmi = float(bmi)
+            hba1c_level = float(hba1c_level)
+            blood_glucose_level = float(blood_glucose_level)
+
+            input_data = {
+                'age': [age],
+                'bmi': [bmi],
+                'hypertension': [hypertension],
+                'heart_disease': [heart_disease],
+                'HbA1c_level': [hba1c_level],
+                'blood_glucose_level': [blood_glucose_level]
+            }
+            input_data_df = pd.DataFrame(input_data)
+            input_data_df['gender'] = gender
+            input_data_df['smoking_history'] = smoking_history
+            input_data_encoded = pd.get_dummies(input_data_df, columns=['gender', 'smoking_history'])
+
+            for col in columnas_entrenamiento:
+                if col not in input_data_encoded.columns:
+                    input_data_encoded[col] = 0
+            input_data_encoded = input_data_encoded[columnas_entrenamiento]
+
+            input_data_scaled = scaler.transform(input_data_encoded)
+
+            rf_proba = rf_model.predict_proba(input_data_scaled)[0][1] * 100
+            svm_proba = svm_model.decision_function(input_data_scaled)
+            logistic_proba = logistic_model.predict_proba(input_data_scaled)[0][1] * 100
+            svm_risk = (1 / (1 + np.exp(-svm_proba))) * 100
+
+            context = {
+                'rf_prediction': round(rf_proba, 2),
+                'svm_prediction': round(svm_risk[0], 2),
+                'logistic_prediction': round(logistic_proba, 2),
+                'blood_glucose_level': blood_glucose_level,
+                'hba1c_level': hba1c_level,
+                'hypertension': hypertension
+            }
+
+            if action == 'guardar_analisis':
+                Paciente.objects.create(
+                    rut=rut,
+                    nombre=nombre,
+                    apellido=apellido,
+                    edad=age,
+                    nacimiento=nacimiento,
+                    genero=gender,
+                    bmi=bmi,
+                    hipertension=hypertension,
+                    enfermedad_cardiaca=heart_disease,
+                    nivel_hba1c=hba1c_level,
+                    nivel_glucosa=blood_glucose_level,
+                    historial_tabaquismo=smoking_history
+                )
+                
+            return render(request, 'aplicacion.html', context)
+
+        except ValueError as ve:
+            print(f"Error de validación: {str(ve)}")
+            return render(request, 'aplicacion.html', {'error': 'Todos los campos son obligatorios y deben tener el formato adecuado.'})
+        except Exception as e:
+            print(f"Error durante la predicción: {str(e)}")
+            return render(request, 'aplicacion.html', {'error': 'Ocurrió un error durante la predicción.'})
+
     return render(request, 'aplicacion.html')
 
 @login_required
