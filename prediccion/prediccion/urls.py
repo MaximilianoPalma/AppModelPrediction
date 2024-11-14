@@ -3,6 +3,10 @@ from django.urls import path
 from appmodel import views
 from django.contrib.auth.decorators import login_required
 
+from appmodel.views import reporteinforme
+
+
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.login, name='login'),
@@ -26,4 +30,5 @@ urlpatterns = [
     path('descargar-reporte/', views.descargar_reporte, name='descargar_reporte'),
 
     path('graficos/', login_required(views.generar_graficos), name='graficos'),
+    path('reportes/', reporteinforme, name='reporteinforme'),
 ]

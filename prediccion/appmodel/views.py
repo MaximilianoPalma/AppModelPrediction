@@ -537,3 +537,37 @@ def registro_soporte(request):
 def listado_soporte(request):
     usuarios_soporte = User.objects.filter(is_staff=True)
     return render(request, 'listado_soporte.html', {'usuarios_soporte': usuarios_soporte})
+
+
+
+
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from appmodel.Reporteseinformes import generar_graficos  # Importar la función de generación de gráficos
+import os
+from django.conf import settings
+
+from appmodel.Reporteseinformes import generar_graficos
+
+@login_required
+def reporteinforme(request):
+    try:
+        # Generar gráficos
+        graficos = generar_graficos()
+
+        # Contexto para el template
+        context = {
+            'grafico_edad': '/' + os.path.relpath(graficos[0], settings.BASE_DIR).replace("\\", "/"),
+            'grafico_comparacion': '/' + os.path.relpath(graficos[1], settings.BASE_DIR).replace("\\", "/"),
+            'grafico_relacion': '/' + os.path.relpath(graficos[2], settings.BASE_DIR).replace("\\", "/"),
+            'grafico_enfermedad_renal': '/' + os.path.relpath(graficos[3], settings.BASE_DIR).replace("\\", "/"),
+        }
+
+        return render(request, 'reporteinforme.html', context)
+    except Exception as e:
+        return HttpResponse(f"Error al generar gráficos: {str(e)}", status=500)
+
+
+
+

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Reportes e Informes{% endblock %}
+
+{% block content %}
+<h1>Reportes e Informes</h1>
+
+<div>
+    <h2>Distribución de Edad</h2>
+    <img src="{{ grafico_edad }}" alt="Gráfico de Edad" style="max-width: 100%;">
+
+    <h2>Comparación entre Tabaquismo y Diabetes</h2>
+    <img src="{{ grafico_comparacion }}" alt="Gráfico de Comparación" style="max-width: 100%;">
+
+    <h2>Relación entre Tabaquismo, Diabetes y Enfermedad Renal</h2>
+    <img src="{{ grafico_relacion }}" alt="Gráfico de Relación" style="max-width: 100%;">
+
+    <h2>Progresión de Enfermedad Renal Crónica</h2>
+    <img src="{{ grafico_enfermedad_renal }}" alt="Gráfico de Enfermedad Renal" style="max-width: 100%;">
+</div>
+{% endblock %}

@@ -88,13 +88,13 @@
 <div class="report-container">
     <h2>Reporte de Casos de Diabetes en Chile</h2>
 
-    <!-- Pestañas -->
     <div>
         <div id="cifras-oficiales-tab" class="tab active" onclick="showTab('cifras-oficiales')">Cifras Oficiales</div>
-        <div id="reportes-e-informes-tab" class="tab" onclick="showTab('reportes-e-informes')">Reportes e Informes</div>
+        <div id="reportes-e-informes-tab" class="tab" onclick="location.href='{% url 'reporteinforme' %}'">Reportes e Informes</div>
         <div id="datos-historicos-tab" class="tab" onclick="showTab('datos-historicos')">Datos Históricos Diabetes Global</div>
         <div id="descarga-datos-tab" class="tab" onclick="showTab('descarga-datos')">Descarga de Datos</div>
     </div>
+    
 
     <!-- Contenido de la pestaña "Cifras Oficiales" -->
     <div id="cifras-oficiales" class="tab-content">
