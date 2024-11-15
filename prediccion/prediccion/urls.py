@@ -25,6 +25,9 @@ urlpatterns = [
     path('registro_soporte/', views.registro_soporte, name='registro_soporte'),
     path('listado_soporte/', views.listado_soporte, name='listado_soporte'),
     
+    path('editar_soporte/<int:soporte_id>/', views.editar_soporte, name='editar_soporte'),
+    path('eliminar_soporte/<int:soporte_id>/', views.eliminar_soporte, name='eliminar_soporte'),
+    
     path('evaluacion-riesgo/', login_required(views.evaluacion_riesgo), name='evaluacion_riesgo'),
 
     path('descargar-reporte/', views.descargar_reporte, name='descargar_reporte'),

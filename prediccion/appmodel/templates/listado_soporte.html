@@ -8,7 +8,7 @@
         <table border="1">
             <thead>
                 <tr>
-                    <th colspan="5">Usuarios de Soporte</th>
+                    <th colspan="7">Usuarios de Soporte</th>
                 </tr>
                 <tr>
                     <th>Nombre</th>
@@ -16,24 +16,85 @@
                     <th>Correo</th>
                     <th>Usuario</th>
                     <th>Fecha de Registro</th>
+                    <th> </th>
+                    <th> </th>
                 </tr>
             </thead>
             <tbody>
                 {% for usuario in usuarios_soporte %}
-                <tr>
-                    <td>{{ usuario.first_name }}</td>
-                    <td>{{ usuario.last_name }}</td>
-                    <td>{{ usuario.email }}</td>
-                    <td>{{ usuario.username }}</td>
-                    <td>{{ usuario.date_joined|date:"d-m-Y" }}</td>
+                <tr id="row-{{ usuario.id }}">
+                    <!-- Formulario de edición -->
+                    <form method="post" action="{% url 'editar_soporte' usuario.id %}">
+                        {% csrf_token %}
+                        <td><span id="nombre-{{ usuario.id }}">{{ usuario.first_name }}</span><input type="text" name="sop_nombre" value="{{ usuario.first_name }}" style="display:none;" id="input-nombre-{{ usuario.id }}"></td>
+                        <td><span id="apellido-{{ usuario.id }}">{{ usuario.last_name }}</span><input type="text" name="sop_apellido" value="{{ usuario.last_name }}" style="display:none;" id="input-apellido-{{ usuario.id }}"></td>
+                        <td><span id="correo-{{ usuario.id }}">{{ usuario.email }}</span><input type="email" name="sop_correo" value="{{ usuario.email }}" style="display:none;" id="input-correo-{{ usuario.id }}"></td>
+                        <td><span id="usuario-{{ usuario.id }}">{{ usuario.username }}</span><input type="text" name="sop_usuario" value="{{ usuario.username }}" style="display:none;" id="input-usuario-{{ usuario.id }}"></td>
+                        <td>{{ usuario.date_joined|date:"d-m-Y" }}</td>
+                        <td>
+                            <!-- Botón para Editar/Guardar -->
+                            <button type="button" id="edit-button-{{ usuario.id }}">Editar</button>
+                            <button type="submit" style="display:none;" id="save-button-{{ usuario.id }}">Guardar</button>
+                        </td>
+                    </form>
+
+                    <!-- Formulario de Eliminación (fuera del formulario de edición) -->
+                    <td>
+                        <form method="post" action="{% url 'eliminar_soporte' usuario.id %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?');" style="color: red; background: none; border: none; cursor: pointer;">
+                                Eliminar
+                            </button>
+                        </form>
+                    </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5">No hay usuarios de soporte registrados</td>
+                    <td colspan="6">No hay usuarios de soporte registrados</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 </div>
+
+<script>
+    function setupEditButtons() {
+        const editButtons = document.querySelectorAll("[id^=edit-button]");
+        editButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                const id = button.id.replace("edit-button-", "");
+                toggleEdit(id);
+            });
+        });
+    }
+
+    function toggleEdit(id) {
+        const elements = ["nombre", "apellido", "correo", "usuario"];
+        elements.forEach(field => {
+            const span = document.getElementById(`${field}-${id}`);
+            const input = document.getElementById(`input-${field}-${id}`);
+            if (span.style.display === "none") {
+                span.style.display = "";
+                input.style.display = "none";
+            } else {
+                span.style.display = "none";
+                input.style.display = "";
+            }
+        });
+
+        const editButton = document.getElementById(`edit-button-${id}`);
+        const saveButton = document.getElementById(`save-button-${id}`);
+        if (editButton.style.display === "none") {
+            editButton.style.display = "";
+            saveButton.style.display = "none";
+        } else {
+            editButton.style.display = "none";
+            saveButton.style.display = "";
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", setupEditButtons);
+</script>
+
 {% endblock %}

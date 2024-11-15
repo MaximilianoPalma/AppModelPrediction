@@ -3,6 +3,7 @@ from django.contrib.auth import login as auth_login, logout as auth_logout
 from appmodel.forms import CustomLoginForm
 from django.contrib.auth.decorators import login_required
 from .models import Paciente
+from django.shortcuts import get_object_or_404
 
 from django.http import HttpResponse
 
@@ -526,7 +527,7 @@ def registro_soporte(request):
                 )
                 user.save()
                 messages.success(request, "Usuario creado exitosamente.")
-                return redirect("index")
+                return redirect("listado_soporte")
             except Exception as e:
                 messages.error(request, f"Error al crear el usuario: {e}")
         else:
@@ -538,7 +539,41 @@ def listado_soporte(request):
     usuarios_soporte = User.objects.filter(is_staff=True)
     return render(request, 'listado_soporte.html', {'usuarios_soporte': usuarios_soporte})
 
+@login_required
+def editar_soporte(request, soporte_id):
+    soporte = get_object_or_404(User, id=soporte_id)
 
+    if request.method == 'POST':
+        soporte.first_name = request.POST.get("sop_nombre")
+        soporte.last_name = request.POST.get("sop_apellido")
+        soporte.email = request.POST.get("sop_correo")
+        soporte.username = request.POST.get("sop_usuario")
+        
+        new_password = request.POST.get("sop_password")
+        password_confirmacion = request.POST.get("sop_password_confirmacion")
+        
+        if new_password and new_password == password_confirmacion:
+            soporte.password = make_password(new_password)
+        elif new_password and new_password != password_confirmacion:
+            messages.error(request, "Las contraseñas no coinciden.")
+            return redirect('editar_soporte', soporte_id=soporte_id)
+        
+        soporte.save()
+        messages.success(request, "Usuario actualizado exitosamente.")
+        return redirect('listado_soporte')
+    
+    return render(request, 'listado_soporte.html', {'soporte': soporte})
+
+@login_required
+def eliminar_soporte(request, soporte_id):
+    soporte = get_object_or_404(User, id=soporte_id)
+    
+    if request.method == 'POST':
+        soporte.delete()
+        messages.success(request, "Usuario eliminado exitosamente.")
+        return redirect('listado_soporte')  # Redirige a la lista de soporte
+    
+    return render(request, 'listado_soporte.html', {'soporte': soporte})
 
 
 from django.shortcuts import render
