@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Listado de Pacientes{% endblock %}
 
@@ -108,15 +109,20 @@
                                 </select>
                             </td>
                             <td>
-                                <button type="button" id="edit-button-{{ paciente.id }}">Editar</button>
-                                <button type="submit" style="display:none;" id="save-button-{{ paciente.id }}">Guardar</button>
+                                <button type="button" id="edit-button-{{ paciente.id }}" style="border: none; background: none; cursor: pointer;">
+                                    <img src="{% static 'editar.png' %}" alt="Editar" style="width: 20px; height: 20px;">
+                                </button>
+
+                                <button type="submit" id="save-button-{{ paciente.id }}" style="display:none; border: none; background: none; cursor: pointer;">
+                                <img src="{% static 'guardar.png' %}" alt="Guardar" style="width: 20px; height: 20px;">
+                            </button>
                             </td>
                         </form>
                         <td>
                             <form method="post" action="{% url 'eliminar_paciente' paciente.id %}" style="display:inline;">
                                 {% csrf_token %}
-                                <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este paciente?');" style="color: red; background: none; border: none; cursor: pointer;">
-                                    Eliminar
+                                <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este paciente?');" style="border: none; background: none; cursor: pointer;">
+                                    <img src="{% static 'eliminar.png' %}" alt="Eliminar" style="width: 20px; height: 20px;">
                                 </button>
                             </form>
                         </td>
