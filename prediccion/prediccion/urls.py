@@ -16,7 +16,10 @@ urlpatterns = [
     
     path('listado/', login_required(views.listado_pacientes), name='listado_pacientes'),
     path('registro/', views.registro_paciente, name='registro_paciente'),
-    path('consulta/', views.consulta_paciente, name='consulta_paciente'),   
+    path('consulta/', views.consulta_paciente, name='consulta_paciente'),
+    
+    path('editar_paciente/<int:paciente_id>/', views.editar_paciente, name='editar_paciente'),
+    path('eliminar_paciente/<int:paciente_id>/', views.eliminar_paciente, name='eliminar_paciente'),   
 
     path('aplicacion/', login_required(views.aplicacion), name='aplicacion'),
     path('informe/', login_required(views.informe), name='informe'),

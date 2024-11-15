@@ -1,93 +1,200 @@
 {% extends 'base.html' %}
 
-{% block title %}Listado{% endblock %}
+{% block title %}Listado de Pacientes{% endblock %}
 
 {% block content %}
-<head>
-    <title>{{ page_title }}</title>
-</head>
-
 <div class="datagrid-container">
     <div class="datagrid">
-        <table border="1">
-            <thead>
-                <tr>
-                    <th colspan="12">Ingresos recientes</th>
-                </tr>
-                <tr>
-                    <th>RUT</th>
-                    <th>Nombre</th>
-                    <th>Apellido</th>
-                    <th>Edad</th>
-                    <th>Nacimiento</th>
-                    <th>Género</th>
-                    <th>Índice de Masa Corporal</th>
-                    <th>Hipertensión</th>
-                    <th>Enfermedad Cardiaca</th>
-                    <th>Nivel HbA1c</th>
-                    <th>Nivel Glucosa</th>
-                    <th>Historial Tabaquismo</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for paciente in pacientes %}
-                <tr>
-                    <td>{{ paciente.rut }}</td>
-                    <td>{{ paciente.nombre }}</td>
-                    <td>{{ paciente.apellido }}</td>
-                    <td>{{ paciente.edad }}</td>
-                    <td>{{ paciente.nacimiento|date:"d-m-Y" }}</td>
-                    <td>
-                        {% if paciente.genero == 1 %}
-                            Hombre
-                        {% elif paciente.genero == 0 %}
-                            Mujer
-                        {% else %}
-                            Otro
-                        {% endif %}
-                    </td>
-                    <td>{{ paciente.bmi }}</td>
-                    <td>{{ paciente.hipertension|yesno:"Sí,No" }}</td>
-                    <td>{{ paciente.enfermedad_cardiaca|yesno:"Sí,No" }}</td>
-                    <td>{{ paciente.nivel_hba1c }}</td>
-                    <td>{{ paciente.nivel_glucosa }}</td>
-                    <td>
-                        {% if paciente.historial_tabaquismo == 0 %}
-                            Nunca
-                        {% elif paciente.historial_tabaquismo == 1 %}
-                            Ex-fumador
-                        {% elif paciente.historial_tabaquismo == 2 %}
-                            Fumador ocasional
-                        {% else %}
-                            Fumador habitual
-                        {% endif %}
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="12">No hay pacientes registrados</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="12">
-                        <div id="paging">
-                            <ul>
-                                <li><a href="#"><span>Anterior</span></a></li>
-                                <li><a href="#" class="active"><span>1</span></a></li>
-                                <li><a href="#"><span>2</span></a></li>
-                                <li><a href="#"><span>3</span></a></li>
-                                <li><a href="#"><span>4</span></a></li>
-                                <li><a href="#"><span>5</span></a></li>
-                                <li><a href="#"><span>Siguiente</span></a></li>
-                            </ul>
-                        </div>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
+        <div class="table-wrapper">
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th colspan="14">Pacientes</th>
+                    </tr>
+                    <tr>
+                        <th>RUT</th>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Edad</th>
+                        <th>Nacimiento</th>
+                        <th>Género</th>
+                        <th>IMC</th>
+                        <th>Hipertensión</th>
+                        <th>Cardiopatía</th>
+                        <th>Nivel HbA1c</th>
+                        <th>Nivel Glucosa</th>
+                        <th>Historial Tabaquismo</th>
+                        <th> </th>
+                        <th> </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for paciente in pacientes %}
+                    <tr id="row-{{ paciente.id }}">
+                        <form method="post" action="{% url 'editar_paciente' paciente.id %}">
+                            {% csrf_token %}
+                            <td>
+                                <span id="rut-{{ paciente.id }}">{{ paciente.rut }}</span>
+                                <input type="text" name="rut" value="{{ paciente.rut }}" style="display:none;" id="input-rut-{{ paciente.id }}">
+                            </td>
+                            <td>
+                                <span id="nombre-{{ paciente.id }}">{{ paciente.nombre }}</span>
+                                <input type="text" name="pac_nombre" value="{{ paciente.nombre }}" style="display:none;" id="input-nombre-{{ paciente.id }}">
+                            </td>
+                            <td>
+                                <span id="apellido-{{ paciente.id }}">{{ paciente.apellido }}</span>
+                                <input type="text" name="pac_apellido" value="{{ paciente.apellido }}" style="display:none;" id="input-apellido-{{ paciente.id }}">
+                            </td>
+                            <td>
+                                <span id="edad-{{ paciente.id }}">{{ paciente.edad }}</span>
+                                <input type="number" name="pac_edad" value="{{ paciente.edad }}" style="display:none;" id="input-edad-{{ paciente.id }}">
+                            </td>
+                            <td>
+                                <span id="nacimiento-{{ paciente.id }}">{{ paciente.nacimiento|date:"d-m-Y" }}</span>
+                                <input type="date" name="pac_nacimiento" value="{{ paciente.nacimiento|date:"Y-m-d" }}" style="display:none;" id="input-nacimiento-{{ paciente.id }}">
+                            </td>
+                            <td>
+                                <span id="genero-{{ paciente.id }}">
+                                    {% if paciente.genero == 1 %} Hombre
+                                    {% elif paciente.genero == 0 %} Mujer
+                                    {% else %} Otro
+                                    {% endif %}
+                                </span>
+                                <select name="pac_genero" style="display:none;" id="input-genero-{{ paciente.id }}">
+                                    <option value="1" {% if paciente.genero == 1 %}selected{% endif %}>Hombre</option>
+                                    <option value="0" {% if paciente.genero == 0 %}selected{% endif %}>Mujer</option>
+                                    <option value="2" {% if paciente.genero == 2 %}selected{% endif %}>Otro</option>
+                                </select>
+                            </td>
+                            <td>
+                                <span id="bmi-{{ paciente.id }}">{{ paciente.bmi }}</span>
+                                <input type="number" step="0.1" name="bmi" value="{{ paciente.bmi }}" style="display:none;" id="input-bmi-{{ paciente.id }}">
+                            </td>
+                            <td>
+                                <span id="hipertension-{{ paciente.id }}">{{ paciente.hipertension|yesno:"Sí,No" }}</span>
+                                <select name="hypertension" style="display:none;" id="input-hipertension-{{ paciente.id }}">
+                                    <option value="1" {% if paciente.hipertension %}selected{% endif %}>Sí</option>
+                                    <option value="0" {% if not paciente.hipertension %}selected{% endif %}>No</option>
+                                </select>
+                            </td>
+                            <td>
+                                <span id="cardiopatia-{{ paciente.id }}">{{ paciente.enfermedad_cardiaca|yesno:"Sí,No" }}</span>
+                                <select name="heart_disease" style="display:none;" id="input-cardiopatia-{{ paciente.id }}">
+                                    <option value="1" {% if paciente.enfermedad_cardiaca %}selected{% endif %}>Sí</option>
+                                    <option value="0" {% if not paciente.enfermedad_cardiaca %}selected{% endif %}>No</option>
+                                </select>
+                            </td>
+                            <td>
+                                <span id="hba1c-{{ paciente.id }}">{{ paciente.nivel_hba1c }}</span>
+                                <input type="number" step="0.1" name="hba1c_level" value="{{ paciente.nivel_hba1c }}" style="display:none;" id="input-hba1c-{{ paciente.id }}">
+                            </td>
+                            <td>
+                                <span id="glucosa-{{ paciente.id }}">{{ paciente.nivel_glucosa }}</span>
+                                <input type="number" step="0.1" name="blood_glucose_level" value="{{ paciente.nivel_glucosa }}" style="display:none;" id="input-glucosa-{{ paciente.id }}">
+                            </td>
+                            <td>
+                                <span id="tabaquismo-{{ paciente.id }}">
+                                    {% if paciente.historial_tabaquismo == 0 %} Nunca
+                                    {% elif paciente.historial_tabaquismo == 1 %} Ex-fumador
+                                    {% elif paciente.historial_tabaquismo == 2 %} Fumador ocasional
+                                    {% else %} Fumador habitual
+                                    {% endif %}
+                                </span>
+                                <select name="smoking_history" style="display:none;" id="input-tabaquismo-{{ paciente.id }}">
+                                    <option value="0" {% if paciente.historial_tabaquismo == 0 %}selected{% endif %}>Nunca</option>
+                                    <option value="1" {% if paciente.historial_tabaquismo == 1 %}selected{% endif %}>Ex-fumador</option>
+                                    <option value="2" {% if paciente.historial_tabaquismo == 2 %}selected{% endif %}>Fumador ocasional</option>
+                                    <option value="3" {% if paciente.historial_tabaquismo == 3 %}selected{% endif %}>Fumador habitual</option>
+                                </select>
+                            </td>
+                            <td>
+                                <button type="button" id="edit-button-{{ paciente.id }}">Editar</button>
+                                <button type="submit" style="display:none;" id="save-button-{{ paciente.id }}">Guardar</button>
+                            </td>
+                        </form>
+                        <td>
+                            <form method="post" action="{% url 'eliminar_paciente' paciente.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" onclick="return confirm('¿Estás seguro de que deseas eliminar este paciente?');" style="color: red; background: none; border: none; cursor: pointer;">
+                                    Eliminar
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="14">No hay pacientes registrados</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="14">
+                            <div id="paging">
+                                <ul>
+                                    <li><a href="#"><span>Anterior</span></a></li>
+                                    <li><a href="#" class="active"><span>1</span></a></li>
+                                    <li><a href="#"><span>2</span></a></li>
+                                    <li><a href="#"><span>3</span></a></li>
+                                    <li><a href="#"><span>4</span></a></li>
+                                    <li><a href="#"><span>5</span></a></li>
+                                    <li><a href="#"><span>Siguiente</span></a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
     </div>
 </div>
+
+<script>
+    function setupEditButtons() {
+        const editButtons = document.querySelectorAll("[id^=edit-button]");
+        editButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                const id = button.id.replace("edit-button-", "");
+                toggleEdit(id);
+            });
+        });
+    }
+
+    function toggleEdit(id) {
+        const fields = ["rut", "nombre", "apellido", "edad", "nacimiento", "genero", "bmi", "hipertension", "cardiopatia", "hba1c", "glucosa", "tabaquismo"];
+        fields.forEach(field => {
+            const span = document.getElementById(`${field}-${id}`);
+            const input = document.getElementById(`input-${field}-${id}`);
+            if (span.style.display === "none") {
+                span.style.display = "";
+                input.style.display = "none";
+            } else {
+                span.style.display = "none";
+                input.style.display = "";
+            }
+        });
+        const button = document.getElementById(`edit-button-${id}`);
+        const saveButton = document.getElementById(`save-button-${id}`);
+        button.style.display = button.style.display === "none" ? "" : "none";
+        saveButton.style.display = saveButton.style.display === "none" ? "" : "none";
+    }
+
+    document.addEventListener("DOMContentLoaded", setupEditButtons);
+</script>
+
+<style>
+    .table-wrapper {
+        max-width: 100%;
+        overflow-x: auto;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    table th, table td {
+        padding: 8px;
+        text-align: center;
+    }
+</style>
 
 {% endblock %}

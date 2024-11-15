@@ -23,7 +23,6 @@
             <tbody>
                 {% for usuario in usuarios_soporte %}
                 <tr id="row-{{ usuario.id }}">
-                    <!-- Formulario de edición -->
                     <form method="post" action="{% url 'editar_soporte' usuario.id %}">
                         {% csrf_token %}
                         <td><span id="nombre-{{ usuario.id }}">{{ usuario.first_name }}</span><input type="text" name="sop_nombre" value="{{ usuario.first_name }}" style="display:none;" id="input-nombre-{{ usuario.id }}"></td>
@@ -32,13 +31,11 @@
                         <td><span id="usuario-{{ usuario.id }}">{{ usuario.username }}</span><input type="text" name="sop_usuario" value="{{ usuario.username }}" style="display:none;" id="input-usuario-{{ usuario.id }}"></td>
                         <td>{{ usuario.date_joined|date:"d-m-Y" }}</td>
                         <td>
-                            <!-- Botón para Editar/Guardar -->
                             <button type="button" id="edit-button-{{ usuario.id }}">Editar</button>
                             <button type="submit" style="display:none;" id="save-button-{{ usuario.id }}">Guardar</button>
                         </td>
                     </form>
 
-                    <!-- Formulario de Eliminación (fuera del formulario de edición) -->
                     <td>
                         <form method="post" action="{% url 'eliminar_soporte' usuario.id %}" style="display:inline;">
                             {% csrf_token %}

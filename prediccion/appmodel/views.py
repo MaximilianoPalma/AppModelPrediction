@@ -68,7 +68,6 @@ def index(request):
 def listado_pacientes(request):
     pacientes = Paciente.objects.all()
     return render(request, 'listado.html', {'pacientes': pacientes})
-    
 
 @login_required
 def registro_paciente(request):
@@ -105,6 +104,40 @@ def registro_paciente(request):
 
     return render(request, 'registro.html')
 
+@login_required
+def editar_paciente(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+
+    if request.method == 'POST':
+        paciente.rut = request.POST.get('rut', paciente.rut)
+        paciente.nombre = request.POST.get('pac_nombre', paciente.nombre)
+        paciente.apellido = request.POST.get('pac_apellido', paciente.apellido)
+        paciente.edad = request.POST.get('pac_edad', paciente.edad)
+        paciente.nacimiento = request.POST.get('pac_nacimiento', paciente.nacimiento)
+        paciente.genero = request.POST.get('pac_genero', paciente.genero)
+        paciente.bmi = request.POST.get('bmi', paciente.bmi)
+        paciente.hipertension = request.POST.get('hypertension', paciente.hipertension)
+        paciente.enfermedad_cardiaca = request.POST.get('heart_disease', paciente.enfermedad_cardiaca)
+        paciente.nivel_hba1c = request.POST.get('hba1c_level', paciente.nivel_hba1c)
+        paciente.nivel_glucosa = request.POST.get('blood_glucose_level', paciente.nivel_glucosa)
+        paciente.historial_tabaquismo = request.POST.get('smoking_history', paciente.historial_tabaquismo)
+        
+        paciente.save()
+        messages.success(request, "Paciente actualizado exitosamente.")
+        return redirect('listado_pacientes')
+    
+    return render(request, 'listado.html', {'paciente': paciente})
+
+@login_required
+def eliminar_paciente(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    
+    if request.method == 'POST':
+        paciente.delete()
+        messages.success(request, "Paciente eliminado exitosamente.")
+        return redirect('listado_pacientes') 
+    
+    return render(request, 'listado.html', {'paciente': paciente})
 
 @login_required
 def consulta_paciente(request):
