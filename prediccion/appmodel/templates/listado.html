@@ -10,7 +10,7 @@
             <table border="1">
                 <thead>
                     <tr>
-                        <th colspan="14">Pacientes</th>
+                        <th colspan="15">Pacientes</th>
                     </tr>
                     <tr>
                         <th>RUT</th>
@@ -25,6 +25,7 @@
                         <th>Nivel HbA1c</th>
                         <th>Nivel Glucosa</th>
                         <th>Historial Tabaquismo</th>
+                        <th> </th>
                         <th> </th>
                         <th> </th>
                     </tr>
@@ -126,16 +127,24 @@
                                 </button>
                             </form>
                         </td>
+                        <td>
+                            <form method="post" action="{% url 'reporte_paciente' paciente.id %}" style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" style="border: none; background: none; cursor: pointer;">
+                                    <img src="{% static 'descargar.png' %}" alt="Descargar" style="width: 20px; height: 20px;">
+                                </button>
+                            </form>
+                        </td>
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="14">No hay pacientes registrados</td>
+                        <td colspan="15">No hay pacientes registrados</td>
                     </tr>
                     {% endfor %}
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="14">
+                        <td colspan="15">
                             <div id="paging">
                                 <ul>
                                     <li><a href="#"><span>Anterior</span></a></li>
@@ -181,8 +190,10 @@
         });
         const button = document.getElementById(`edit-button-${id}`);
         const saveButton = document.getElementById(`save-button-${id}`);
+        const downloadButton = document.getElementById(`download-button-${id}`);
         button.style.display = button.style.display === "none" ? "" : "none";
         saveButton.style.display = saveButton.style.display === "none" ? "" : "none";
+        downloadButton.style.display = downloadButton.style.display === "none" ? "" : "none";
     }
 
     document.addEventListener("DOMContentLoaded", setupEditButtons);

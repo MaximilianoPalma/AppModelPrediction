@@ -30,6 +30,12 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
 
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib import colors
+from reportlab.lib.styles import getSampleStyleSheet
+from datetime import date, timedelta
+import re
+
 @login_required
 def base(request):
     return render(request, 'base.html')
@@ -151,6 +157,74 @@ def consulta_paciente(request):
             paciente = None
 
     return render(request, 'consulta.html', {'paciente': paciente})
+
+def formatear_rut(rut):
+    rut = str(rut)
+    cuerpo, verificador = rut[:-1], rut[-1]
+    cuerpo = re.sub(r"\B(?=(\d{3})+(?!\d))", ".", cuerpo)
+    return f"{cuerpo}{verificador}"
+
+def reporte_paciente(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    
+    hoy = date.today()
+    nacimiento = paciente.nacimiento
+    
+    edad_anos = hoy.year - nacimiento.year - ((hoy.month, hoy.day) < (nacimiento.month, nacimiento.day))
+    
+    if hoy.month >= nacimiento.month:
+        edad_meses = hoy.month - nacimiento.month
+    else:
+        edad_meses = 12 - (nacimiento.month - hoy.month)
+
+    if hoy.day >= nacimiento.day:
+        edad_dias = hoy.day - nacimiento.day
+    else:
+        edad_meses -= 1
+        if edad_meses < 0:
+            edad_meses = 11
+            edad_anos -= 1
+        ultimo_dia_mes_anterior = (hoy.replace(day=1) - timedelta(days=1)).day
+        edad_dias = ultimo_dia_mes_anterior - nacimiento.day + hoy.day
+    
+    edad_completa = f"{edad_anos} años, {edad_meses} meses, {edad_dias} días"
+    
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="reporte_paciente_{paciente.rut}.pdf"'
+    
+    pdf = SimpleDocTemplate(response, pagesize=letter)
+    
+    estilos = getSampleStyleSheet()
+    estilo_normal = estilos['Normal']
+    
+    elementos = []
+
+    titulo = Paragraph(f"<b>Reporte: </b>", estilos['Title'])
+    elementos.append(titulo)
+    elementos.append(Spacer(1, 12))
+
+    rut_formateado = formatear_rut(paciente.rut)
+
+    data = [
+        ['RUT:', rut_formateado],
+        ['Nombre:', f"{paciente.nombre} {paciente.apellido}"],
+        ['Edad:', edad_completa],
+        ['Género:', 'Hombre' if paciente.genero == 1 else 'Mujer' if paciente.genero == 0 else 'Otro'],
+        ['Índice de Masa Corporal (BMI):', paciente.bmi],
+        ['Hipertensión:', 'Sí' if paciente.hipertension == 1 else 'No'],
+        ['Enfermedad Cardiaca:', 'Sí' if paciente.enfermedad_cardiaca == 1 else 'No'],
+        ['Nivel de HbA1c:', paciente.nivel_hba1c],
+        ['Nivel de Glucosa en Sangre:', paciente.nivel_glucosa],
+        ['Historial de Tabaquismo:','Nunca' if paciente.historial_tabaquismo == 0 else 'Ex-fumador' if paciente.historial_tabaquismo == 1 else 'Fumador ocasional' if paciente.historial_tabaquismo == 2 else 'Fumador habitual']
+    ]
+
+    for item in data:
+        elementos.append(Paragraph(f"<b>{item[0]}</b> {item[1]}", estilo_normal))
+        elementos.append(Spacer(1, 12))
+
+    pdf.build(elementos)
+
+    return response
 
 @login_required
 def aplicacion(request):
