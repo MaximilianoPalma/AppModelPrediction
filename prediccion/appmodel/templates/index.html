@@ -86,7 +86,7 @@
 </head>
 
 <div class="report-container">
-    <h2>Reporte de Casos de Diabetes en Chile</h2>
+    <h2>Reporte de Casos de Diabetes </h2>
 
     <div>
         <div id="cifras-oficiales-tab" class="tab active" onclick="showTab('cifras-oficiales')">Cifras Oficiales</div>
@@ -168,6 +168,10 @@
             <img id="image" src="{% load static %}{% static 'edad.png' %}" alt="Gráfico de Edad">
             <button class="nav-button left" onclick="prevImage()">&#10094;</button>
             <button class="nav-button right" onclick="nextImage()">&#10095;</button>
+
+            <div class="report-footer">
+                <p><em>Fuente:</em> Gráfico Distribución Edad Conjunto de Datos Egipcio (2024). Basado en datos de <a href="https://www.kaggle.com/code/omarmohamedelgharib/diabetes-prediction" target="_blank">Kaggle</a>.</p>
+            </div>  
         </div>
 
     </div>
