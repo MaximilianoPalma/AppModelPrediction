@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Inicio{% endblock %}
 
@@ -90,11 +91,10 @@
 
     <div>
         <div id="cifras-oficiales-tab" class="tab active" onclick="showTab('cifras-oficiales')">Cifras Oficiales</div>
-        <div id="reportes-e-informes-tab" class="tab" onclick="location.href='{% url 'reporteinforme' %}'">Reportes e Informes</div>
+        <div id="reporte-informe-tab" class="tab" onclick="showTab('reporte-informe')">Reportes e Informes</div>
         <div id="datos-historicos-tab" class="tab" onclick="showTab('datos-historicos')">Datos Históricos Diabetes Global</div>
         <div id="descarga-datos-tab" class="tab" onclick="showTab('descarga-datos')">Descarga de Datos</div>
     </div>
-    
 
     <!-- Contenido de la pestaña "Cifras Oficiales" -->
     <div id="cifras-oficiales" class="tab-content">
@@ -154,26 +154,36 @@
     </div>
 
     <!-- Pestaña vacía "Reportes e Informes" -->
-    <div id="reportes-e-informes" class="tab-content" style="display:none;">
-        <h4>Reportes e Informes</h4>
-        <p>Esta sección está vacía por ahora.</p>
+    <div id="reporte-informe" class="tab-content" style="display:none;">
+        <h4>Datos Históricos</h4>
+
+        <div class="image-container">
+            <h3 id="reportImage-title">Distribución de Edad</h3>
+            <img id="reportImage" src="{% static 'edad.png' %}" alt="Gráfico de Edad">
+            <button class="nav-button left" onclick="prevReportImage()">&#10094;</button>
+            <button class="nav-button right" onclick="nextReportImage()">&#10095;</button>
+
+            <div class="report-footer">
+                <p><em>Fuente:</em> Gráfico Distribución Edad Conjunto de Datos Egipcio (2024). Basado en datos de <a href="https://www.kaggle.com/code/omarmohamedelgharib/diabetes-prediction" target="_blank">Kaggle</a>.</p>
+            </div>  
+        </div>
     </div>
+
 
     <!-- Pestaña "Datos Históricos" -->
     <div id="datos-historicos" class="tab-content" style="display:none;">
         <h4>Datos Históricos</h4>
 
         <div class="image-container">
-            <h3 id="image-title">Distribución de Edad</h3>
-            <img id="image" src="{% load static %}{% static 'edad.png' %}" alt="Gráfico de Edad">
-            <button class="nav-button left" onclick="prevImage()">&#10094;</button>
-            <button class="nav-button right" onclick="nextImage()">&#10095;</button>
+            <h3 id="historicImage-title">Distribución de Edad</h3>
+            <img id="historicImage" src="{% static 'edad.png' %}" alt="Gráfico de Edad">
+            <button class="nav-button left" onclick="prevHistoricImage()">&#10094;</button>
+            <button class="nav-button right" onclick="nextHistoricImage()">&#10095;</button>
 
             <div class="report-footer">
                 <p><em>Fuente:</em> Gráfico Distribución Edad Conjunto de Datos Egipcio (2024). Basado en datos de <a href="https://www.kaggle.com/code/omarmohamedelgharib/diabetes-prediction" target="_blank">Kaggle</a>.</p>
             </div>  
         </div>
-
     </div>
 
     <!-- Pestaña vacía "Descarga de Datos" -->
@@ -184,27 +194,52 @@
 
     <script>
         // Array de imágenes y títulos
-        const images = [
-            { src: "{% load static %}{% static 'mapadiabetes.png' %}", title: "Mapa Diabetes Global" },
-            { src: "{% load static %}{% static 'edad.png' %}", title: "Distribución de Edad" },
-            { src: "{% load static %}{% static 'glucosa.png' %}", title: "Nivel de Glucosa" },
-            { src: "{% load static %}{% static 'hemoglobina.png' %}", title: "Hemoglobina Glicosilada" }
+        const historicImages = [
+            { src: "{% static 'mapadiabetes.png' %}", title: "Mapa Diabetes Global" },
+            { src: "{% static 'edad.png' %}", title: "Distribución de Edad" },
+            { src: "{% static 'glucosa.png' %}", title: "Nivel de Glucosa" },
+            { src: "{% static 'hemoglobina.png' %}", title: "Hemoglobina Glicosilada" }
         ];
-        let currentImageIndex = 0;
+        let currentHistoricIndex = 0;
 
-        function nextImage() {
-            currentImageIndex = (currentImageIndex + 1) % images.length; // Ciclo a través de las imágenes
-            updateImage();
+        function nextHistoricImage() {
+            currentHistoricIndex = (currentHistoricIndex + 1) % historicImages.length; // Ciclo a través de las imágenes
+            updateHistoricImage();
         }
 
-        function prevImage() {
-            currentImageIndex = (currentImageIndex - 1 + images.length) % images.length; // Ciclo a través de las imágenes
-            updateImage();
+        function prevHistoricImage() {
+            currentHistoricIndex = (currentHistoricIndex - 1 + historicImages.length) % historicImages.length; // Ciclo a través de las imágenes
+            updateHistoricImage();
         }
 
-        function updateImage() {
-            document.getElementById('image').src = images[currentImageIndex].src;
-            document.getElementById('image-title').innerText = images[currentImageIndex].title;
+        function updateHistoricImage() {
+            document.getElementById('historicImage').src = historicImages[currentHistoricIndex].src;
+            document.getElementById('historicImage-title').innerText = historicImages[currentHistoricIndex].title;
+        }
+
+        // Array de imágenes y títulos reporte
+
+        const reportImages = [
+            { src: "{% static 'grafico_edad.png' %}", title: "Distribución por edad" },
+            { src: "{% static 'grafico_comparacion.png' %}", title: "Comparación entre Tabaquismo y Diabetes" },
+            { src: "{% static 'grafico_relacion.png' %}", title: "Relación entre Tabaquismo, Diabetes y Enfermedad Renal" },
+            { src: "{% static 'grafico_enfermedad_renal.png' %}", title: "Progresión de Enfermedad Renal Crónica" }
+        ];
+        let currentReportIndex = 0;
+
+        function nextReportImage() {
+            currentReportIndex = (currentReportIndex + 1) % reportImages.length; // Ciclo a través de las imágenes
+            updateReportImage();
+        }
+
+        function prevReportImage() {
+            currentReportIndex = (currentReportIndex - 1 + reportImages.length) % reportImages.length; // Ciclo a través de las imágenes
+            updateReportImage();
+        }
+
+        function updateReportImage() {
+            document.getElementById('reportImage').src = reportImages[currentReportIndex].src;
+            document.getElementById('reportImage-title').innerText = reportImages[currentReportIndex].title;
         }
     </script>
 
