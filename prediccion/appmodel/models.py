@@ -20,6 +20,7 @@ class Paciente(models.Model):
     historial_tabaquismo = models.IntegerField(choices=[
         (0, 'Nunca'), (1, 'Ex-fumador'), (2, 'Fumador ocasional'), (3, 'Fumador habitual')
     ])
+    observaciones = models.CharField(max_length=250)
 
     def __str__(self):
         return f'{self.nombre} {self.apellido}'

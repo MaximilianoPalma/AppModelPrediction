@@ -33,7 +33,7 @@ from django.contrib.auth.hashers import make_password
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 import re
 
 @login_required
@@ -53,10 +53,8 @@ def login(request):
 
 @login_required
 def index(request):
-    # Calcular los datos del reporte en tiempo real
     datos_reporte = calcular_datos_reporte()
 
-    # Contexto para enviar los datos al template
     context = {
         'promedio_diario': datos_reporte['promedio_diario'],
         'total_semanal': datos_reporte['total_semanal'],
@@ -90,25 +88,33 @@ def registro_paciente(request):
         nivel_hba1c = request.POST['hba1c_level']
         nivel_glucosa = request.POST['blood_glucose_level']
         historial_tabaquismo = request.POST['smoking_history']
-        
+        observaciones = request.POST['observaciones']
+
+        try:
+            fecha_formateada = datetime.strptime(nacimiento, '%d-%m-%Y').date()
+        except ValueError:
+            return HttpResponse("Error en el formato de la fecha. Debe ser DD-MM-YYYY.")
+
         Paciente.objects.create(
             rut=rut,
             nombre=nombre,
             apellido=apellido,
             edad=edad,
-            nacimiento=nacimiento,
+            nacimiento=fecha_formateada,
             genero=genero,
             bmi=bmi,
             hipertension=hipertension,
             enfermedad_cardiaca=enfermedad_cardiaca,
             nivel_hba1c=nivel_hba1c,
             nivel_glucosa=nivel_glucosa,
-            historial_tabaquismo=historial_tabaquismo
+            historial_tabaquismo=historial_tabaquismo,
+            observaciones=observaciones
         )
-        
-        return redirect('index') 
+
+        return redirect('listado_pacientes')
 
     return render(request, 'registro.html')
+
 
 @login_required
 def editar_paciente(request, paciente_id):
@@ -127,6 +133,8 @@ def editar_paciente(request, paciente_id):
         paciente.nivel_hba1c = request.POST.get('hba1c_level', paciente.nivel_hba1c)
         paciente.nivel_glucosa = request.POST.get('blood_glucose_level', paciente.nivel_glucosa)
         paciente.historial_tabaquismo = request.POST.get('smoking_history', paciente.historial_tabaquismo)
+        paciente.historial_tabaquismo = request.POST.get('smoking_history', paciente.historial_tabaquismo)
+        paciente.observaciones = request.POST.get('observaciones', paciente.observaciones)
         
         paciente.save()
         messages.success(request, "Paciente actualizado exitosamente.")
@@ -215,7 +223,8 @@ def reporte_paciente(request, paciente_id):
         ['Enfermedad Cardiaca:', 'Sí' if paciente.enfermedad_cardiaca == 1 else 'No'],
         ['Nivel de HbA1c:', paciente.nivel_hba1c],
         ['Nivel de Glucosa en Sangre:', paciente.nivel_glucosa],
-        ['Historial de Tabaquismo:','Nunca' if paciente.historial_tabaquismo == 0 else 'Ex-fumador' if paciente.historial_tabaquismo == 1 else 'Fumador ocasional' if paciente.historial_tabaquismo == 2 else 'Fumador habitual']
+        ['Historial de Tabaquismo:','Nunca' if paciente.historial_tabaquismo == 0 else 'Ex-fumador' if paciente.historial_tabaquismo == 1 else 'Fumador ocasional' if paciente.historial_tabaquismo == 2 else 'Fumador habitual'],
+        ['Observaciones:', paciente.observaciones]
     ]
 
     for item in data:
@@ -334,7 +343,6 @@ def consulta_paciente(request):
     if request.method == 'POST':
         rut = request.POST.get('rut')
         try:
-
             paciente = Paciente.objects.get(rut=rut)
 
             return render(request, 'consulta.html', {

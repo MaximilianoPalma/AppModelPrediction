@@ -1,9 +1,31 @@
 <!-- templates/registro.html -->
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Registro paciente{% endblock %}
 
 {% block content %}
+
+<style>
+    .grid-container {
+        display: grid;
+        grid-template-columns: 3fr 1fr;
+        gap: 20px; 
+        width: 275%; 
+    }
+
+    .textarea-group {
+        grid-column: 1;
+    }
+
+    .form-actions {
+        grid-column: 2;
+        display: flex;
+        justify-content: right;
+        align-items: center;
+        padding-top: 30px;
+    }
+</style>
 
 <div class="form-register-container">
     <h2>Datos del paciente</h2>
@@ -89,7 +111,16 @@
             </select>
         </div>
 
-        <button type="submit">Registrar datos</button>
+        <div class="grid-container">
+            <div class="form-group textarea-group">
+                <label for="observaciones">Observaciones:</label>
+                <textarea id="observaciones" name="observaciones"></textarea>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Registrar datos</button>
+            </div>
+        </div>
     </form>
 </div>
 

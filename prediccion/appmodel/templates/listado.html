@@ -10,7 +10,7 @@
             <table border="1">
                 <thead>
                     <tr>
-                        <th colspan="15">Pacientes</th>
+                        <th colspan="16">Pacientes</th>
                     </tr>
                     <tr>
                         <th>RUT</th>
@@ -25,6 +25,7 @@
                         <th>Nivel HbA1c</th>
                         <th>Nivel Glucosa</th>
                         <th>Historial Tabaquismo</th>
+                        <th>Observaciones</th>
                         <th> </th>
                         <th> </th>
                         <th> </th>
@@ -110,6 +111,10 @@
                                 </select>
                             </td>
                             <td>
+                                <span id="observaciones-{{ paciente.id }}">{{ paciente.observaciones }}</span>
+                                <input type="text" name="pac_observaciones" value="{{ paciente.observaciones }}" style="display:none;" id="input-observaciones-{{ paciente.id }}">
+                            </td>
+                            <td>
                                 <button type="button" id="edit-button-{{ paciente.id }}" style="border: none; background: none; cursor: pointer;">
                                     <img src="{% static 'editar.png' %}" alt="Editar" style="width: 20px; height: 20px;">
                                 </button>
@@ -138,13 +143,13 @@
                     </tr>
                     {% empty %}
                     <tr>
-                        <td colspan="15">No hay pacientes registrados</td>
+                        <td colspan="16">No hay pacientes registrados</td>
                     </tr>
                     {% endfor %}
                 </tbody>
                 <tfoot>
                     <tr>
-                        <td colspan="15">
+                        <td colspan="16">
                             <div id="paging">
                                 <ul>
                                     <li><a href="#"><span>Anterior</span></a></li>
@@ -176,7 +181,7 @@
     }
 
     function toggleEdit(id) {
-        const fields = ["rut", "nombre", "apellido", "edad", "nacimiento", "genero", "bmi", "hipertension", "cardiopatia", "hba1c", "glucosa", "tabaquismo"];
+        const fields = ["rut", "nombre", "apellido", "edad", "nacimiento", "genero", "bmi", "hipertension", "cardiopatia", "hba1c", "glucosa", "tabaquismo", "observaciones"];
         fields.forEach(field => {
             const span = document.getElementById(`${field}-${id}`);
             const input = document.getElementById(`input-${field}-${id}`);
