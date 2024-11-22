@@ -133,8 +133,7 @@ def editar_paciente(request, paciente_id):
         paciente.nivel_hba1c = request.POST.get('hba1c_level', paciente.nivel_hba1c)
         paciente.nivel_glucosa = request.POST.get('blood_glucose_level', paciente.nivel_glucosa)
         paciente.historial_tabaquismo = request.POST.get('smoking_history', paciente.historial_tabaquismo)
-        paciente.historial_tabaquismo = request.POST.get('smoking_history', paciente.historial_tabaquismo)
-        paciente.observaciones = request.POST.get('observaciones', paciente.observaciones)
+        paciente.observaciones = request.POST.get('pac_observaciones', paciente.observaciones)
         
         paciente.save()
         messages.success(request, "Paciente actualizado exitosamente.")
@@ -203,36 +202,86 @@ def reporte_paciente(request, paciente_id):
     pdf = SimpleDocTemplate(response, pagesize=letter)
     
     estilos = getSampleStyleSheet()
-    estilo_normal = estilos['Normal']
     
     elementos = []
 
-    titulo = Paragraph(f"<b>Reporte: </b>", estilos['Title'])
+    estilo_titulo = estilos['Title']
+    estilo_titulo.textColor = colors.white
+    estilo_titulo.backColor = colors.HexColor('#0066cc') 
+    estilo_titulo.fontSize = 14
+    titulo = Paragraph(f"<b>Reporte Médico</b>", estilo_titulo)
     elementos.append(titulo)
     elementos.append(Spacer(1, 12))
 
+    azul_titulo = colors.HexColor('#0066cc') 
+    azul_palido = colors.HexColor('#e6f3ff') 
+
     rut_formateado = formatear_rut(paciente.rut)
 
-    data = [
-        ['RUT:', rut_formateado],
-        ['Nombre:', f"{paciente.nombre} {paciente.apellido}"],
-        ['Edad:', edad_completa],
-        ['Género:', 'Hombre' if paciente.genero == 1 else 'Mujer' if paciente.genero == 0 else 'Otro'],
-        ['Índice de Masa Corporal (BMI):', paciente.bmi],
-        ['Hipertensión:', 'Sí' if paciente.hipertension == 1 else 'No'],
-        ['Enfermedad Cardiaca:', 'Sí' if paciente.enfermedad_cardiaca == 1 else 'No'],
-        ['Nivel de HbA1c:', paciente.nivel_hba1c],
-        ['Nivel de Glucosa en Sangre:', paciente.nivel_glucosa],
-        ['Historial de Tabaquismo:','Nunca' if paciente.historial_tabaquismo == 0 else 'Ex-fumador' if paciente.historial_tabaquismo == 1 else 'Fumador ocasional' if paciente.historial_tabaquismo == 2 else 'Fumador habitual'],
-        ['Observaciones:', paciente.observaciones]
+    data_personales = [
+        ['Datos Personales', ''],
+        ['RUT', rut_formateado],
+        ['Nombre', f"{paciente.nombre} {paciente.apellido}"],
+        ['Edad', edad_completa],
+        ['Género', 'Hombre' if paciente.genero == 1 else 'Mujer' if paciente.genero == 0 else 'Otro']
     ]
+    tabla_personales = Table(data_personales, colWidths=['*', '*'])
+    tabla_personales.setStyle(TableStyle([
+        ('SPAN', (0, 0), (1, 0)), ('VALIGN', (0, 1), (-1, -1), 'TOP'),  
+        ('BACKGROUND', (0, 0), (1, 0), azul_titulo),  
+        ('TEXTCOLOR', (0, 0), (1, 0), colors.white),  
+        ('ALIGN', (0, 0), (1, 0), 'CENTER'),
+        ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), azul_palido), 
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black), 
+        ('ALIGN', (0, 1), (-1, -1), 'LEFT'),
+    ]))
+    elementos.append(tabla_personales)
+    elementos.append(Spacer(1, 12))
 
-    for item in data:
-        elementos.append(Paragraph(f"<b>{item[0]}</b> {item[1]}", estilo_normal))
-        elementos.append(Spacer(1, 12))
+    data_medicos = [
+        ['Datos Médicos', ''],
+        ['Índice de Masa Corporal (BMI)', paciente.bmi],
+        ['Hipertensión', 'Sí' if paciente.hipertension == 1 else 'No'],
+        ['Enfermedad Cardiaca', 'Sí' if paciente.enfermedad_cardiaca == 1 else 'No'],
+        ['Nivel de HbA1c', paciente.nivel_hba1c],
+        ['Nivel de Glucosa en Sangre', paciente.nivel_glucosa],
+        ['Historial de Tabaquismo', 'Nunca' if paciente.historial_tabaquismo == 0 else 'Ex-fumador' if paciente.historial_tabaquismo == 1 else 'Fumador ocasional' if paciente.historial_tabaquismo == 2 else 'Fumador habitual']
+    ]
+    tabla_medicos = Table(data_medicos, colWidths=['*', '*'])
+    tabla_medicos.setStyle(TableStyle([
+        ('SPAN', (0, 0), (1, 0)),
+        ('BACKGROUND', (0, 0), (1, 0), azul_titulo),  
+        ('TEXTCOLOR', (0, 0), (1, 0), colors.white),  
+        ('ALIGN', (0, 0), (1, 0), 'CENTER'),
+        ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), azul_palido), 
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black), 
+        ('ALIGN', (0, 1), (-1, -1), 'LEFT'),
+    ]))
+    elementos.append(tabla_medicos)
+    elementos.append(Spacer(1, 12))
 
+    data_observaciones = [
+        ['Observaciones Médicas', ''],
+        ['Observaciones', paciente.observaciones if paciente.observaciones else 'No hay observaciones registradas']
+    ]
+    tabla_observaciones = Table(data_observaciones, colWidths=['*', '*'])
+    tabla_observaciones.setStyle(TableStyle([
+        ('SPAN', (0, 0), (1, 0)),  
+        ('BACKGROUND', (0, 0), (1, 0), azul_titulo),  
+        ('TEXTCOLOR', (0, 0), (1, 0), colors.white),  
+        ('ALIGN', (0, 0), (1, 0), 'CENTER'),
+        ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), azul_palido),
+        ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+        ('ALIGN', (0, 1), (-1, -1), 'LEFT'),
+    ]))
+    elementos.append(tabla_observaciones)
     pdf.build(elementos)
-
     return response
 
 @login_required
