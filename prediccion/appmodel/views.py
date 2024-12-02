@@ -4,37 +4,32 @@ from appmodel.forms import CustomLoginForm
 from django.contrib.auth.decorators import login_required
 from .models import Paciente
 from django.shortcuts import get_object_or_404
-
 from django.http import HttpResponse
-
 from django.conf import settings
 import joblib
 import numpy as np
-
 from reportlab.lib.pagesizes import letter
 from .reporte_utils import calcular_datos_reporte
-
 import requests
 from bs4 import BeautifulSoup
-
+import plotly.graph_objects as go
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 from io import BytesIO
 import base64
-
 from PIL import Image, ImageDraw, ImageFont
-
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
-
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from datetime import date, timedelta, datetime
 import re
+import urllib3
+import json
 
 @login_required
 def base(request):
@@ -46,7 +41,7 @@ def login(request):
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
-            return redirect('index')
+            return redirect('inicio')
     else:
         form = CustomLoginForm()
     return render(request, 'login.html', {'form': form})
@@ -67,6 +62,20 @@ def index(request):
     }
 
     return render(request, 'index.html', context)
+
+def inicio(request):
+    try:
+        graficos = generarGraficos()
+        
+        context = {
+            'graficos': graficos
+        }
+        
+        return render(request, 'inicio.html', context)
+    
+    except Exception as e:
+        print(f"Error al generar gráficos: {e}")
+        return render(request, 'inicio.html', {'graficos': []})
 
 @login_required
 def listado_pacientes(request):
@@ -114,7 +123,6 @@ def registro_paciente(request):
         return redirect('listado_pacientes')
 
     return render(request, 'registro.html')
-
 
 @login_required
 def editar_paciente(request, paciente_id):
@@ -488,12 +496,10 @@ def evaluacion_riesgo(request):
 
 @login_required
 def descargar_reporte(request):
-    # Crear una imagen en blanco
     width, height = 800, 600
     img = Image.new('RGB', (width, height), color=(255, 255, 255))
     d = ImageDraw.Draw(img)
 
-    # Títulos y datos del reporte
     d.text((10, 10), "Reporte de Casos de Diabetes en Chile", fill=(0, 0, 0))
     d.text((10, 50), f"Promedio diario de casos: {request.GET.get('promedio_diario', 'N/A')}", fill=(0, 0, 0))
     d.text((10, 70), f"Total semanal de casos: {request.GET.get('total_semanal', 'N/A')}", fill=(0, 0, 0))
@@ -503,7 +509,6 @@ def descargar_reporte(request):
     d.text((10, 150), f"Fallecidos reportados esta semana: {request.GET.get('fallecidos_semanales', 'N/A')}", fill=(0, 0, 0))
     d.text((10, 170), f"Fallecidos totales: {request.GET.get('fallecidos_totales', 'N/A')}", fill=(0, 0, 0))
 
-    # Guardar la imagen en un objeto BytesIO
     response = HttpResponse(content_type='image/png')
     response['Content-Disposition'] = 'attachment; filename="reporte_diabetes.png"'
     img.save(response, 'PNG')
@@ -511,19 +516,17 @@ def descargar_reporte(request):
     return response
 
 def generar_reporte_vista():
-    # Datos base
     semana_epidemiologica = "41 semana epidemiológica 2024 (6 al 12 de octubre)"
     promedio_diario_casos = 44
     total_semanal_casos = 306
-    test_realizados = 5707  # Exámenes realizados
-    test_hba1c = 4549  # Ejemplo: Hemoglobina Glicosilada HbA1c
-    test_glucosa = 1158  # Ejemplo: Test de glucosa en ayunas
-    fallecidos_totales = 58017  # Fallecidos totales en Chile
+    test_realizados = 5707
+    test_hba1c = 4549 
+    test_glucosa = 1158  
+    fallecidos_totales = 58017
     fallecidos_semanales = 11
     fallecidos_confirmados = 6
     fallecidos_sospechosos = 5
 
-    # Reporte estructurado
     reporte = f"""
     ***{semana_epidemiologica}***
 
@@ -551,13 +554,11 @@ def obtener_datos_diabetes():
     url = 'https://soched.cl/new/cual-es-la-frecuencia-de-diabetes-en-chile-como-se-si-tengo-diabetes/'
     response = requests.get(url)
 
-    # Verificar que la solicitud fue exitosa
     if response.status_code != 200:
         return "Error al obtener los datos de la fuente."
 
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    # Intentar encontrar un párrafo que mencione la prevalencia de diabetes
     try:
         prevalencia = soup.find('p', string=lambda text: 'diabetes' in text.lower()).text
         if prevalencia:
@@ -567,12 +568,10 @@ def obtener_datos_diabetes():
     except AttributeError:
         return "Error al procesar los datos."
 
-# Función que utiliza datos actuales de scraping en vez de datos fijos
 def calcular_datos_reporte():
-    # Obtener la información de la página de SOCHED
+
     prevalencia_diabetes = obtener_datos_diabetes()
 
-    # Datos base de diabetes en Chile con scraping (supongamos que la prevalencia es el porcentaje extraído)
     poblacion_total = 19492603  # Población total de Chile en 2023
     porcentaje_diabetes = 0.123  # 12.3% (o usar prevalencia_diabetes si puedes extraer el número de allí)
     
@@ -739,14 +738,8 @@ def eliminar_soporte(request, soporte_id):
     
     return render(request, 'listado_soporte.html', {'soporte': soporte})
 
-
-from django.shortcuts import render
-from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 from appmodel.Reporteseinformes import generar_graficos  # Importar la función de generación de gráficos
-import os
-from django.conf import settings
-
 from appmodel.Reporteseinformes import generar_graficos
 
 @login_required
@@ -767,6 +760,128 @@ def reporteinforme(request):
     except Exception as e:
         return HttpResponse(f"Error al generar gráficos: {str(e)}", status=500)
 
+def extraerDatosJSON():
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+    url = "https://reportesrem.minsal.cl/?_token=KSVIcB6RieJr6t2NiQ3cUyx38ELjtKXM7faUUrzV&serie=5&rem=117&seccion_id=1417&tipo=3&tipoReload=3&regiones=0&regionesReload=0&servicios=-1&serviciosReload=-1&periodo=2020&mes_inicio=6&mes_final=6"
 
+    response = requests.get(url, verify=False)
+    soup = BeautifulSoup(response.content, "html.parser")
 
+    table = soup.find("table", {"class": "table-bordered"})
+    rows = table.find_all("tr")
+    data = []
+
+    for row in rows:
+        cols = row.find_all("td")
+        cols = [col.text.strip() for col in cols]
+        if cols:
+            data.append(cols)
+
+    output_dir = os.path.join(settings.BASE_DIR, 'static', 'reportes')
+    os.makedirs(output_dir, exist_ok=True)
+    json_path = os.path.join(output_dir, 'datos.json')
+    
+    with open(json_path, 'w', encoding='utf-8') as json_file:
+        json.dump(data, json_file, ensure_ascii=False, indent=4)
+
+    return json_path
+
+def generarGraficos():
+    json_path = extraerDatosJSON()
+
+    with open(json_path, 'r', encoding='utf-8') as json_file:
+        data = json.load(json_file)
+
+    df = pd.DataFrame(data)
+
+    df = df.dropna(how="all").reset_index(drop=True)
+    df.columns = ["CONCEPTO"] + [f"Columna_{i}" for i in range(1, df.shape[1])]
+    df["CONCEPTO"] = df["CONCEPTO"].str.strip()
+
+    diabeticos = df[df["CONCEPTO"] == "DIABETICOS"].iloc[0]
+    tabaquismo = df[df["CONCEPTO"] == "TABAQUISMO ≥ 55 AÑOS"].iloc[0]
+    enfermedad_renal = df[df["CONCEPTO"].str.contains("ETAPA", na=False)]
+
+    def extract_numeric(series):
+        return series[1:15].apply(pd.to_numeric, errors='coerce').fillna(0)
+
+    diabeticos_data = extract_numeric(diabeticos)
+    tabaquismo_data = extract_numeric(tabaquismo)
+    enfermedad_renal_data = enfermedad_renal.iloc[:, 1:15].apply(pd.to_numeric, errors='coerce').fillna(0).sum(axis=0)
+
+    grupos_edad = [
+        "15 a 19 años", "20 a 24 años", "25 a 29 años", "30 a 34 años",
+        "35 a 39 años", "40 a 44 años", "45 a 49 años", "50 a 54 años",
+        "55 a 59 años", "60 a 64 años", "65 a 69 años", "70 a 74 años",
+        "75 a 79 años", "80 y más años"
+    ]
+
+    output_dir = os.path.join(settings.BASE_DIR, 'static')
+    os.makedirs(output_dir, exist_ok=True)
+
+    graficos = []
+
+    # Gráfico 1 - Distribución de Pacientes Diabéticos por Grupo de Edad
+    fig1 = go.Figure()
+    fig1.add_trace(go.Bar(x=grupos_edad, y=diabeticos_data, name='Diabéticos'))
+    fig1.update_layout(
+        title='Distribución de Pacientes Diabéticos por Grupo de Edad',
+        xaxis_title='Grupos de Edad',
+        yaxis_title='Cantidad de Pacientes',
+        xaxis_tickangle=-45
+    )
+    grafico_1 = os.path.join(output_dir, 'afico_edad.html')
+    fig1.write_html(grafico_1)
+    graficos.append('/static/afico_edad.html')
+
+    # Gráfico 2 - Comparación entre Tabaquismo y Diabetes por Grupo de Edad
+    fig2 = go.Figure()
+    fig2.add_trace(go.Bar(x=grupos_edad, y=tabaquismo_data, name='Tabaquismo'))
+    fig2.add_trace(go.Bar(x=grupos_edad, y=diabeticos_data, name='Diabéticos'))
+    fig2.update_layout(
+        title='Comparación entre Tabaquismo y Diabetes por Grupo de Edad',
+        xaxis_title='Grupos de Edad',
+        yaxis_title='Cantidad de Personas',
+        xaxis_tickangle=45,
+        barmode='stack'
+    )
+    grafico_2 = os.path.join(output_dir, 'afico_comparacion.html')
+    fig2.write_html(grafico_2)
+    graficos.append('/static/afico_comparacion.html')
+
+    # Gráfico 3 - Relación entre Tabaquismo, Diabetes y Enfermedad Renal Crónica
+    fig3 = go.Figure()
+    fig3.add_trace(go.Bar(x=grupos_edad, y=tabaquismo_data, name='Tabaquismo'))
+    fig3.add_trace(go.Bar(x=grupos_edad, y=diabeticos_data, name='Diabéticos'))
+    fig3.add_trace(go.Bar(x=grupos_edad, y=enfermedad_renal_data, name='Enfermedad Renal Crónica'))
+    fig3.update_layout(
+        title='Relación entre Tabaquismo, Diabetes y Enfermedad Renal Crónica',
+        xaxis_title='Grupos de Edad',
+        yaxis_title='Cantidad de Personas',
+        xaxis_tickangle=-45,
+        barmode='stack'
+    )
+    grafico_3 = os.path.join(output_dir, 'afico_relacion.html')
+    fig3.write_html(grafico_3)
+    graficos.append('/static/afico_relacion.html')
+
+    # Gráfico 4 - Progresión de Enfermedad Renal Crónica en Pacientes Diabéticos
+    fig4 = go.Figure()
+    fig4.add_trace(go.Bar(x=grupos_edad, y=enfermedad_renal_data))
+    fig4.update_layout(
+        title='Progresión de Enfermedad Renal Crónica en Pacientes Diabéticos',
+        xaxis_title='Grupos de Edad',
+        yaxis_title='Cantidad de Pacientes',
+        xaxis_tickangle=45
+    )
+    grafico_4 = os.path.join(output_dir, 'afico_enfermedad_renal.html')
+    fig4.write_html(grafico_4)
+    graficos.append('/static/afico_enfermedad_renal.html')
+
+    return [
+        '/static/reportes/grafico_edad.html',
+        '/static/reportes/grafico_comparacion.html',
+        '/static/reportes/grafico_relacion.html',
+        '/static/reportes/grafico_enfermedad_renal.html'
+    ]

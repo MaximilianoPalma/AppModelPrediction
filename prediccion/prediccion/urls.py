@@ -5,14 +5,14 @@ from django.contrib.auth.decorators import login_required
 
 from appmodel.views import reporteinforme
 
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
     
     path('index/', login_required(views.index), name='index'),
+    
+    path('inicio/', login_required(views.inicio), name='inicio'),
     
     path('listado/', login_required(views.listado_pacientes), name='listado_pacientes'),
     path('registro/', views.registro_paciente, name='registro_paciente'),
