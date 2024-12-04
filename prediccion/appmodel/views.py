@@ -822,6 +822,13 @@ def generarGraficos():
 
     graficos = []
 
+    config = {
+        'scrollZoom': False,  # Deshabilitar el zoom con el scroll del mouse
+        'displayModeBar': False,  # Ocultar la barra de herramientas
+        'doubleClick': 'reset',  # Deshabilitar el zoom con doble clic
+        'modeBarButtonsToRemove': ['zoom', 'pan', 'select', 'lasso2d']  # Remover herramientas de zoom y selección
+    }
+
     # Gráfico 1 - Distribución de Pacientes Diabéticos por Grupo de Edad
     fig1 = go.Figure()
     fig1.add_trace(go.Bar(x=grupos_edad, y=diabeticos_data, name='Diabéticos'))
@@ -832,7 +839,7 @@ def generarGraficos():
         xaxis_tickangle=-45
     )
     grafico_1 = os.path.join(output_dir, 'afico_edad.html')
-    fig1.write_html(grafico_1)
+    fig1.write_html(grafico_1, config=config)
     graficos.append('/static/afico_edad.html')
 
     # Gráfico 2 - Comparación entre Tabaquismo y Diabetes por Grupo de Edad
@@ -847,7 +854,7 @@ def generarGraficos():
         barmode='stack'
     )
     grafico_2 = os.path.join(output_dir, 'afico_comparacion.html')
-    fig2.write_html(grafico_2)
+    fig2.write_html(grafico_2, config=config)
     graficos.append('/static/afico_comparacion.html')
 
     # Gráfico 3 - Relación entre Tabaquismo, Diabetes y Enfermedad Renal Crónica
@@ -863,7 +870,7 @@ def generarGraficos():
         barmode='stack'
     )
     grafico_3 = os.path.join(output_dir, 'afico_relacion.html')
-    fig3.write_html(grafico_3)
+    fig3.write_html(grafico_3, config=config)
     graficos.append('/static/afico_relacion.html')
 
     # Gráfico 4 - Progresión de Enfermedad Renal Crónica en Pacientes Diabéticos
@@ -876,7 +883,7 @@ def generarGraficos():
         xaxis_tickangle=45
     )
     grafico_4 = os.path.join(output_dir, 'afico_enfermedad_renal.html')
-    fig4.write_html(grafico_4)
+    fig4.write_html(grafico_4, config=config)
     graficos.append('/static/afico_enfermedad_renal.html')
 
     return [
