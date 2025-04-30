@@ -30,6 +30,7 @@ from datetime import date, timedelta, datetime
 import re
 import urllib3
 import json
+from django.core.mail import EmailMessage
 
 @login_required
 def base(request):
@@ -291,6 +292,99 @@ def reporte_paciente(request, paciente_id):
     elementos.append(tabla_observaciones)
     pdf.build(elementos)
     return response
+
+@login_required
+def enviar_reporte(request, paciente_id):
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+
+    if request.method == "POST":
+        destinatario_email = request.POST.get("email")
+
+        if not destinatario_email:
+            return HttpResponse("Debe proporcionar una dirección de correo electrónico.", status=400)
+
+        hoy = date.today()
+        nacimiento = paciente.nacimiento
+
+        edad_anos = hoy.year - nacimiento.year - ((hoy.month, hoy.day) < (nacimiento.month, nacimiento.day))
+
+        if hoy.month >= nacimiento.month:
+            edad_meses = hoy.month - nacimiento.month
+        else:
+            edad_meses = 12 - (nacimiento.month - hoy.month)
+
+        if hoy.day >= nacimiento.day:
+            edad_dias = hoy.day - nacimiento.day
+        else:
+            edad_meses -= 1
+            if edad_meses < 0:
+                edad_meses = 11
+                edad_anos -= 1
+            ultimo_dia_mes_anterior = (hoy.replace(day=1) - timedelta(days=1)).day
+            edad_dias = ultimo_dia_mes_anterior - nacimiento.day + hoy.day
+
+        edad_completa = f"{edad_anos} años, {edad_meses} meses, {edad_dias} días"
+
+        response = HttpResponse(content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="reporte_paciente_{paciente.rut}.pdf"'
+        pdf = SimpleDocTemplate(response, pagesize=letter)
+        estilos = getSampleStyleSheet()
+        elementos = []
+
+        estilo_titulo = estilos['Title']
+        estilo_titulo.textColor = colors.white
+        estilo_titulo.backColor = colors.HexColor('#0066cc') 
+        estilo_titulo.fontSize = 14
+        titulo = Paragraph(f"<b>Reporte Médico</b>", estilo_titulo)
+        elementos.append(titulo)
+        elementos.append(Spacer(1, 12))
+
+        azul_titulo = colors.HexColor('#0066cc') 
+        azul_palido = colors.HexColor('#e6f3ff') 
+
+        rut_formateado = formatear_rut(paciente.rut)
+
+        data_personales = [
+            ['Datos Personales', ''],
+            ['RUT', rut_formateado],
+            ['Nombre', f"{paciente.nombre} {paciente.apellido}"],
+            ['Edad', edad_completa],
+            ['Género', 'Hombre' if paciente.genero == 1 else 'Mujer' if paciente.genero == 0 else 'Otro']
+        ]
+
+        tabla_personales = Table(data_personales, colWidths=['*', '*'])
+        tabla_personales.setStyle(TableStyle([
+            ('SPAN', (0, 0), (1, 0)), ('VALIGN', (0, 1), (-1, -1), 'TOP'),  
+            ('BACKGROUND', (0, 0), (1, 0), azul_titulo),  
+            ('TEXTCOLOR', (0, 0), (1, 0), colors.white),  
+            ('ALIGN', (0, 0), (1, 0), 'CENTER'),
+            ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
+            ('BOTTOMPADDING', (0, 0), (1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), azul_palido), 
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black), 
+            ('ALIGN', (0, 1), (-1, -1), 'LEFT'),
+        ]))
+        elementos.append(tabla_personales)
+        elementos.append(Spacer(1, 12))
+
+        pdf.build(elementos)
+
+        email = EmailMessage(
+            subject='Reporte de Paciente',
+            body=(
+                f'Estimado/a {paciente.nombre} {paciente.apellido},\n\n'
+                'Adjunto a este correo se encuentra el reporte médico solicitado.\n\n'
+                'Saludos cordiales.'
+            ),
+            from_email='tu_correo@example.com',
+            to=[destinatario_email],
+        )
+        email.attach(f'reporte_paciente_{paciente.rut}.pdf', response.getvalue(), 'application/pdf')
+        email.send()
+
+        return HttpResponse("Correo enviado exitosamente.")
+
+    return HttpResponse("Método no permitido.", status=405)
 
 @login_required
 def aplicacion(request):
