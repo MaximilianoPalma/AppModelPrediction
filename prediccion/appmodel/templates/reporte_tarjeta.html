@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center text-primary mb-4">📊 Reporte Nacional de Casos de Diabetes</h2>
+
+    <div class="card shadow p-4 mb-5 bg-white rounded">
+        <h4 class="text-center text-secondary mb-3">📅 Semana Epidemiológica Actual</h4>
+        <div class="row text-center">
+            <div class="col-md-6 mb-3">
+                <div class="bg-light p-3 border rounded">
+                    <h5>Promedio Diario de Casos</h5>
+                    <h2 class="text-primary">{{ promedio_diario }}</h2>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="bg-light p-3 border rounded">
+                    <h5>Total Semanal de Casos</h5>
+                    <h2 class="text-danger">{{ total_semanal }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="row text-center mt-4">
+            <div class="col-md-4 mb-3">
+                <div class="bg-light p-3 border rounded">
+                    <h6>🧪 Test Realizados</h6>
+                    <h3>{{ test_realizados }}</h3>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="bg-light p-3 border rounded">
+                    <h6>📈 Nuevos Casos Diarios</h6>
+                    <h3>{{ nuevos_casos_diarios }}</h3>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="bg-light p-3 border rounded">
+                    <h6>📅 Nuevos Casos Semanales</h6>
+                    <h3>{{ nuevos_casos_semanales }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="row text-center mt-4">
+            <div class="col-md-6 mb-3">
+                <div class="bg-light p-3 border rounded">
+                    <h6>🕯 Fallecidos esta Semana</h6>
+                    <h3 class="text-danger">{{ fallecidos_semanales }}</h3>
+                </div>
+            </div>
+            <div class="col-md-6 mb-3">
+                <div class="bg-light p-3 border rounded">
+                    <h6>⚰ Fallecidos Totales</h6>
+                    <h3 class="text-danger">{{ fallecidos_totales }}</h3>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="{% url 'descargar_reporte' %}?promedio_diario={{ promedio_diario }}&total_semanal={{ total_semanal }}&test_realizados={{ test_realizados }}&nuevos_casos_diarios={{ nuevos_casos_diarios }}&nuevos_casos_semanales={{ nuevos_casos_semanales }}&fallecidos_semanales={{ fallecidos_semanales }}&fallecidos_totales={{ fallecidos_totales }}" 
+               class="btn btn-outline-success btn-lg">
+                📥 Descargar Reporte como Imagen
+            </a>
+        </div>
+    </div>
+</div>
+
+{% endblock

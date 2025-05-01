@@ -49,34 +49,31 @@ def login(request):
 
 @login_required
 def index(request):
-    datos_reporte = calcular_datos_reporte()
-
-    context = {
-        'promedio_diario': datos_reporte['promedio_diario'],
-        'total_semanal': datos_reporte['total_semanal'],
-        'casos_totales': datos_reporte['casos_totales'],
-        'nuevos_casos_diarios': datos_reporte['nuevos_casos_diarios'],
-        'nuevos_casos_semanales': datos_reporte['nuevos_casos_semanales'],
-        'test_realizados': datos_reporte['test_realizados'],
-        'fallecidos_totales': datos_reporte['fallecidos_totales'],
-        'fallecidos_semanales': datos_reporte['fallecidos_semanales'],
-    }
-
-    return render(request, 'index.html', context)
-
-def inicio(request):
     try:
+        datos_reporte = calcular_datos_reporte()
         graficos = generarGraficos()
-        
+
         context = {
-            'graficos': graficos
+            'graficos': graficos,
+            'promedio_diario': datos_reporte['promedio_diario'],
+            'total_semanal': datos_reporte['total_semanal'],
+            'casos_totales': datos_reporte['casos_totales'],
+            'nuevos_casos_diarios': datos_reporte['nuevos_casos_diarios'],
+            'nuevos_casos_semanales': datos_reporte['nuevos_casos_semanales'],
+            'test_realizados': datos_reporte['test_realizados'],
+            'fallecidos_totales': datos_reporte['fallecidos_totales'],
+            'fallecidos_semanales': datos_reporte['fallecidos_semanales'],
         }
-        
+
         return render(request, 'inicio.html', context)
-    
+
     except Exception as e:
-        print(f"Error al generar gráficos: {e}")
-        return render(request, 'inicio.html', {'graficos': []})
+        print(f"❌ Error al generar gráficos o reporte: {e}")
+        return render(request, 'inicio.html', {
+            'graficos': [],
+            'error': 'Error al generar el reporte o los gráficos.'
+        })
+
 
 @login_required
 def listado_pacientes(request):
@@ -644,56 +641,91 @@ def generar_reporte_vista():
 
     return reporte
 
+import requests
+from bs4 import BeautifulSoup
+
 def obtener_datos_diabetes():
     url = 'https://soched.cl/new/cual-es-la-frecuencia-de-diabetes-en-chile-como-se-si-tengo-diabetes/'
-    response = requests.get(url)
-
-    if response.status_code != 200:
-        return "Error al obtener los datos de la fuente."
-
-    soup = BeautifulSoup(response.text, 'html.parser')
 
     try:
-        prevalencia = soup.find('p', string=lambda text: 'diabetes' in text.lower()).text
-        if prevalencia:
-            return prevalencia
-        else:
-            return "No se encontraron datos actualizados."
-    except AttributeError:
+        response = requests.get(url, timeout=10)
+        if response.status_code != 200:
+            return "Error al obtener los datos de la fuente."
+
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        # Recorre todos los párrafos y busca uno que mencione "diabetes" y contenga un %
+        for p in soup.find_all('p'):
+            texto = p.get_text()
+            if 'diabetes' in texto.lower() and '%' in texto:
+                print("📌 Párrafo encontrado:", texto)
+                return texto
+
+        return "No se encontraron datos actualizados."
+
+    except Exception as e:
+        print("❌ Error al hacer scraping:", e)
         return "Error al procesar los datos."
 
+
 def calcular_datos_reporte():
+    print("🔍 Entrando a calcular_datos_reporte()")
 
-    prevalencia_diabetes = obtener_datos_diabetes()
+    try:
+        # Intentar obtener la prevalencia real
+        prevalencia_diabetes = obtener_datos_diabetes()
+        print("🌐 Prevalencia obtenida:", prevalencia_diabetes)
 
-    poblacion_total = 19492603  # Población total de Chile en 2023
-    porcentaje_diabetes = 0.123  # 12.3% (o usar prevalencia_diabetes si puedes extraer el número de allí)
-    
-    incremento_anual = 0.00414  # Incremento anual estimado (puedes ajustarlo según los datos disponibles)
+        # Si quieres extraer un número desde el texto prevalencia_diabetes puedes aplicar regex aquí
+        porcentaje_diabetes = 0.123  # Usamos fijo por ahora
+    except Exception as e:
+        print("❌ Error obteniendo datos web:", e)
+        porcentaje_diabetes = 0.123  # Valor por defecto
 
-    # Casos actuales y nuevos casos
-    casos_totales = poblacion_total * porcentaje_diabetes
-    nuevos_casos_anuales = poblacion_total * incremento_anual
-    nuevos_casos_diarios = nuevos_casos_anuales / 365
-    nuevos_casos_semanales = nuevos_casos_diarios * 7
+    try:
+        poblacion_total = 19492603  # Chile 2023
+        incremento_anual = 0.00414  # Estimación
 
-    # Datos adicionales (ejemplos de test realizados y fallecidos)
-    total_semanal = 306  # Ejemplo de total semanal
-    promedio_diario = total_semanal / 7
-    test_realizados = 5707  # Ejemplo de test realizados
-    fallecidos_totales = 58017  # Ejemplo
-    fallecidos_semanales = 11  # Ejemplo
+        casos_totales = poblacion_total * porcentaje_diabetes
+        nuevos_casos_anuales = poblacion_total * incremento_anual
+        nuevos_casos_diarios = nuevos_casos_anuales / 365
+        nuevos_casos_semanales = nuevos_casos_diarios * 7
 
-    return {
-        'casos_totales': int(casos_totales),
-        'nuevos_casos_diarios': int(nuevos_casos_diarios),
-        'nuevos_casos_semanales': int(nuevos_casos_semanales),
-        'promedio_diario': int(promedio_diario),
-        'total_semanal': int(total_semanal),
-        'test_realizados': test_realizados,
-        'fallecidos_totales': fallecidos_totales,
-        'fallecidos_semanales': fallecidos_semanales,
-    }
+        # Ejemplo de valores reales o estimados
+        total_semanal = 306
+        promedio_diario = total_semanal / 7
+        test_realizados = 5707
+        fallecidos_totales = 58017
+        fallecidos_semanales = 11
+
+        datos = {
+            'casos_totales': int(casos_totales),
+            'nuevos_casos_diarios': int(nuevos_casos_diarios),
+            'nuevos_casos_semanales': int(nuevos_casos_semanales),
+            'promedio_diario': int(promedio_diario),
+            'total_semanal': int(total_semanal),
+            'test_realizados': test_realizados,
+            'fallecidos_totales': fallecidos_totales,
+            'fallecidos_semanales': fallecidos_semanales,
+        }
+
+        print("✅ Datos calculados:", datos)
+        return datos
+
+    except Exception as e:
+        print("❌ Error en cálculo de datos:", e)
+        # Valores de respaldo
+        return {
+            'casos_totales': 0,
+            'nuevos_casos_diarios': 0,
+            'nuevos_casos_semanales': 0,
+            'promedio_diario': 0,
+            'total_semanal': 0,
+            'test_realizados': 0,
+            'fallecidos_totales': 0,
+            'fallecidos_semanales': 0,
+        }
+
 
 @login_required
 def generar_graficos(request):

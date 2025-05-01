@@ -241,6 +241,13 @@
             document.getElementById('reportImage').src = reportImages[currentReportIndex].src;
             document.getElementById('reportImage-title').innerText = reportImages[currentReportIndex].title;
         }
+
+
+        // Mostrar automáticamente la pestaña de cifras oficiales al cargar la página
+        document.addEventListener("DOMContentLoaded", function () {
+            showTab('cifras-oficiales');
+        });
+
     </script>
 
 </div>
