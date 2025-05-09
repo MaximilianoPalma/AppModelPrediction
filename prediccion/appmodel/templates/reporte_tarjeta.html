@@ -59,12 +59,11 @@
         </div>
 
         <div class="text-center mt-4">
-            <a href="{% url 'descargar_reporte' %}?promedio_diario={{ promedio_diario }}&total_semanal={{ total_semanal }}&test_realizados={{ test_realizados }}&nuevos_casos_diarios={{ nuevos_casos_diarios }}&nuevos_casos_semanales={{ nuevos_casos_semanales }}&fallecidos_semanales={{ fallecidos_semanales }}&fallecidos_totales={{ fallecidos_totales }}" 
-               class="btn btn-outline-success btn-lg">
+            <a href="{% url 'descargar_reporte' %}?promedio_diario={{ promedio_diario }}&total_semanal={{ total_semanal }}&test_realizados={{ test_realizados }}&nuevos_casos_diarios={{ nuevos_casos_diarios }}&nuevos_casos_semanales={{ nuevos_casos_semanales }}&fallecidos_semanales={{ fallecidos_semanales }}&fallecidos_totales={{ fallecidos_totales }}" class="btn btn-outline-success btn-lg">
                 📥 Descargar Reporte como Imagen
             </a>
         </div>
     </div>
 </div>
 
-{% endblock
+% endblock

@@ -669,20 +669,22 @@ def obtener_datos_diabetes():
 
 
 def calcular_datos_reporte():
-    print("🔍 Entrando a calcular_datos_reporte()")
+#    print("🔍 Entrando a calcular_datos_reporte()")
 
-    try:
+#    try:
         # Intentar obtener la prevalencia real
-        prevalencia_diabetes = obtener_datos_diabetes()
-        print("🌐 Prevalencia obtenida:", prevalencia_diabetes)
+#        prevalencia_diabetes = obtener_datos_diabetes()
+#        print("🌐 Prevalencia obtenida:", prevalencia_diabetes)
 
-        # Si quieres extraer un número desde el texto prevalencia_diabetes puedes aplicar regex aquí
-        porcentaje_diabetes = 0.123  # Usamos fijo por ahora
-    except Exception as e:
-        print("❌ Error obteniendo datos web:", e)
-        porcentaje_diabetes = 0.123  # Valor por defecto
+#        # Si quieres extraer un número desde el texto prevalencia_diabetes puedes aplicar regex aquí
+#        porcentaje_diabetes = 0.123  # Usamos fijo por ahora
+#    except Exception as e:
+#        print("❌ Error obteniendo datos web:", e)
+#        porcentaje_diabetes = 0.123  # Valor por defecto
 
     try:
+        porcentaje_diabetes = 0.123  # Usamos fijo por ahora
+        
         poblacion_total = 19492603  # Chile 2023
         incremento_anual = 0.00414  # Estimación
 
