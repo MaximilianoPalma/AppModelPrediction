@@ -13,7 +13,7 @@ import seaborn as sns
 
 # Obtener la ruta del directorio base
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-data_path = os.path.join(base_dir, 'diabetes_project', 'data', 'diabetes_prediction_dataset.csv')
+data_path = os.path.join(base_dir, 'algoritmos', 'diabetes_prediction_dataset.csv')
 
 # Leer el archivo CSV
 print("Leyendo el archivo CSV...")
@@ -57,7 +57,7 @@ smote = SMOTE(sampling_strategy='auto', random_state=42)
 X_train_resampled, y_train_resampled = smote.fit_resample(X_train, y_train)
 
 # Guardar el escalador
-scaler_path = os.path.join(base_dir, 'modelos', 'scaler.pkl')
+scaler_path = os.path.join(base_dir, 'algoritmos', 'scaler.pkl')
 joblib.dump(scaler, scaler_path)
 print(f"Scaler guardado en: {scaler_path}")
 
@@ -72,7 +72,7 @@ for name, clf in classifiers.items():
     clf.fit(X_train_resampled, y_train_resampled)
     
     # Guardar cada modelo
-    model_path = os.path.join(base_dir, 'modelos', f'{name.lower().replace(" ", "_")}_model.pkl')
+    model_path = os.path.join(base_dir, 'algoritmos', f'{name.lower().replace(" ", "_")}_model.pkl')
     joblib.dump(clf, model_path)
     print(f"Modelo {name} guardado en: {model_path}")
 

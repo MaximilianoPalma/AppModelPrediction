@@ -3,7 +3,7 @@ import os
 
 # Ruta completa al archivo CSV
 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-data_path = os.path.join(base_dir, 'diabetes_project', 'data', 'diabetes_prediction_dataset.csv')
+data_path = os.path.join(base_dir, 'algoritmos', 'diabetes_prediction_dataset.csv')
 
 # Leer el archivo CSV
 df = pd.read_csv(data_path)
