@@ -528,6 +528,15 @@ columnas_entrenamiento = scaler.feature_names_in_
 
 @login_required
 def evaluacion_riesgo(request):
+    def calcular_nivel_riesgo_general(rf, svm, lr):
+        promedio = (rf + svm + lr) / 3
+        if promedio <= 30:
+            return "bajo"
+        elif promedio <= 60:
+            return "medio"
+        else:
+            return "alto"
+
     if request.method == 'POST':
         try:
             age = int(request.POST.get('age'))
@@ -559,7 +568,6 @@ def evaluacion_riesgo(request):
                     input_data_encoded[col] = 0
 
             input_data_encoded = input_data_encoded[columnas_entrenamiento]
-
             input_data_scaled = scaler.transform(input_data_encoded)
 
             rf_proba = rf_model.predict_proba(input_data_scaled)[0][1] * 100
@@ -568,13 +576,16 @@ def evaluacion_riesgo(request):
 
             svm_risk = (1 / (1 + np.exp(-svm_proba))) * 100
 
+            nivel_riesgo_general = calcular_nivel_riesgo_general(rf_proba, svm_risk[0], logistic_proba)
+
             context = {
                 'rf_prediction': round(rf_proba, 2),
                 'svm_prediction': round(svm_risk[0], 2),
                 'logistic_prediction': round(logistic_proba, 2),
                 'blood_glucose_level': blood_glucose_level,
                 'HbA1c_level': Hba1c_level,
-                'hypertension': hypertension
+                'hypertension': hypertension,
+                'nivel_riesgo_general': nivel_riesgo_general  # 👈 aquí lo pasamos al template
             }
 
             return render(request, 'consulta.html', context)
@@ -584,6 +595,7 @@ def evaluacion_riesgo(request):
             return render(request, 'consulta.html', {'error': 'Ocurrió un error durante la predicción.'})
 
     return render(request, 'consulta.html')
+
 
 @login_required
 def descargar_reporte(request):
