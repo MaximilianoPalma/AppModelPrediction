@@ -436,13 +436,30 @@ def aplicacion(request):
             logistic_proba = logistic_model.predict_proba(input_data_scaled)[0][1] * 100
             svm_risk = (1 / (1 + np.exp(-svm_proba))) * 100
 
+            # Función para calcular el nivel de riesgo general
+            def calcular_nivel_riesgo_general(rf, svm, lr):
+                promedio = (rf + svm + lr) / 3
+                if promedio <= 30:
+                    return "bajo"
+                elif promedio <= 60:
+                    return "medio"
+                else:
+                    return "alto"
+
+            nivel_riesgo_general = calcular_nivel_riesgo_general(rf_proba, svm_risk[0], logistic_proba)
+
             context = {
                 'rf_prediction': round(rf_proba, 2),
                 'svm_prediction': round(svm_risk[0], 2),
                 'logistic_prediction': round(logistic_proba, 2),
                 'blood_glucose_level': blood_glucose_level,
                 'hba1c_level': hba1c_level,
-                'hypertension': hypertension
+                'hypertension': hypertension,
+                'bmi': bmi,
+                'age': age,
+                'smoking_history': smoking_history,
+                'HbA1c_level': hba1c_level,
+                'nivel_riesgo_general': nivel_riesgo_general
             }
 
             if action == 'guardar_analisis':

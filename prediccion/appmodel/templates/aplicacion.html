@@ -213,6 +213,57 @@
     </div>
 </div>
 
+<!-- 🔻 BLOQUE FINAL: PLAN DE RECOMENDACIÓN GENERAL -->
+{% if nivel_riesgo_general %}
+<div class="form-register-container" style="margin-top: 40px;">
+    <h2 style="text-align:center;">🧭 Plan de Recomendación General</h2>
+
+    {% if nivel_riesgo_general == "bajo" %}
+    <p style="text-align:center;">Riesgo bajo detectado. Mantener hábitos saludables es clave para prevenir.</p>
+    {% elif nivel_riesgo_general == "medio" %}
+    <p style="text-align:center;">Riesgo moderado. Se recomienda control médico preventivo y ajuste de hábitos.</p>
+    {% elif nivel_riesgo_general == "alto" %}
+    <p style="text-align:center; font-weight: bold;">Riesgo alto. Derivación médica inmediata recomendada.</p>
+    {% endif %}
+
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin-top: 20px;">
+        <div style="background-color: #e0f7e9; border-radius: 10px; padding: 20px; width: 280px; text-align: center; margin: 10px;">
+            <h4>🥗 Alimentación Saludable</h4>
+            {% if nivel_riesgo_general == "bajo" %}
+            <p>Continúa con una dieta equilibrada rica en vegetales, frutas y fibra.</p>
+            {% elif nivel_riesgo_general == "medio" %}
+            <p>Reduce azúcar y harinas refinadas. Prioriza alimentos frescos.</p>
+            {% elif nivel_riesgo_general == "alto" %}
+            <p>Requiere planificación nutricional supervisada. Consulta con nutricionista.</p>
+            {% endif %}
+        </div>
+
+        <div style="background-color: #e7f0ff; border-radius: 10px; padding: 20px; width: 280px; text-align: center; margin: 10px;">
+            <h4>🏃 Actividad Física</h4>
+            {% if nivel_riesgo_general == "bajo" %}
+            <p>Ejercicio moderado 3-5 veces por semana. Mantén el movimiento.</p>
+            {% elif nivel_riesgo_general == "medio" %}
+            <p>Inicia rutina regular de 30 minutos diarios. Evita el sedentarismo.</p>
+            {% elif nivel_riesgo_general == "alto" %}
+            <p>Debe ser evaluada por médico. Comienza con caminatas y evaluación funcional.</p>
+            {% endif %}
+        </div>
+
+        <div style="background-color: #ffeaea; border-radius: 10px; padding: 20px; width: 280px; text-align: center; margin: 10px;">
+            <h4>🩺 Control de la Diabetes</h4>
+            {% if nivel_riesgo_general == "bajo" %}
+            <p>Chequeo anual suficiente si no hay síntomas.</p>
+            {% elif nivel_riesgo_general == "medio" %}
+            <p>Controles cada 3-6 meses. Monitoreo de glucosa y presión arterial.</p>
+            {% elif nivel_riesgo_general == "alto" %}
+            <p>Derivación inmediata a endocrinología. Evaluación urgente de HbA1c y glucosa.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+
 
 <script>
     $(function() {
