@@ -81,6 +81,16 @@ def listado_pacientes(request):
     return render(request, 'listado.html', {'pacientes': pacientes})
 
 @login_required
+def verificar_rut(request):
+    """Vista AJAX para verificar si un RUT ya existe"""
+    if request.method == 'GET':
+        rut = request.GET.get('rut', '').strip()
+        if rut:
+            existe = Paciente.objects.filter(rut=rut).exists()
+            return JsonResponse({'existe': existe, 'rut': rut})
+        return JsonResponse({'existe': False, 'rut': ''})
+
+@login_required
 def registro_paciente(request):
     if request.method == 'POST':
         rut = request.POST['rut']
@@ -96,6 +106,26 @@ def registro_paciente(request):
         nivel_glucosa = request.POST['blood_glucose_level']
         historial_tabaquismo = request.POST['smoking_history']
         observaciones = request.POST['observaciones']
+
+        # Verificar si el RUT ya existe
+        if Paciente.objects.filter(rut=rut).exists():
+            context = {
+                'error_rut': f'Ya existe un paciente registrado con el RUT {rut}',
+                'rut': rut,
+                'nombre': nombre,
+                'apellido': apellido,
+                'edad': edad,
+                'nacimiento': nacimiento,
+                'genero': genero,
+                'bmi': bmi,
+                'hipertension': hipertension,
+                'enfermedad_cardiaca': enfermedad_cardiaca,
+                'nivel_hba1c': nivel_hba1c,
+                'nivel_glucosa': nivel_glucosa,
+                'historial_tabaquismo': historial_tabaquismo,
+                'observaciones': observaciones
+            }
+            return render(request, 'registro.html', context)
 
         try:
             fecha_formateada = datetime.strptime(nacimiento, '%d-%m-%Y').date()
@@ -459,10 +489,23 @@ def aplicacion(request):
                 'age': age,
                 'smoking_history': smoking_history,
                 'HbA1c_level': hba1c_level,
-                'nivel_riesgo_general': nivel_riesgo_general
+                'nivel_riesgo_general': nivel_riesgo_general,
+                # Datos del formulario para preservar
+                'rut': rut,
+                'nombre': nombre,
+                'apellido': apellido,
+                'nacimiento': nacimiento,
+                'gender': gender,
+                'heart_disease': heart_disease
             }
 
             if action == 'guardar_analisis':
+                # Verificar si el RUT ya existe antes de guardar
+                if Paciente.objects.filter(rut=rut).exists():
+                    context['error_rut'] = f'Ya existe un paciente registrado con el RUT {rut}. Use "Solo análisis" para continuar sin registrar.'
+                    return render(request, 'aplicacion.html', context)
+                
+                # Si no existe, crear el paciente
                 Paciente.objects.create(
                     rut=rut,
                     nombre=nombre,
@@ -478,14 +521,46 @@ def aplicacion(request):
                     historial_tabaquismo=smoking_history
                 )
                 
+                context['registro_exitoso'] = True
+                
             return render(request, 'aplicacion.html', context)
 
         except ValueError as ve:
             print(f"Error de validación: {str(ve)}")
-            return render(request, 'aplicacion.html', {'error': 'Todos los campos son obligatorios y deben tener el formato adecuado.'})
+            context = {
+                'error': 'Todos los campos son obligatorios y deben tener el formato adecuado.',
+                'rut': request.POST.get('rut', ''),
+                'nombre': request.POST.get('nombre', ''),
+                'apellido': request.POST.get('apellido', ''),
+                'age': request.POST.get('age', ''),
+                'nacimiento': request.POST.get('nacimiento', ''),
+                'gender': request.POST.get('gender', ''),
+                'bmi': request.POST.get('bmi', ''),
+                'hypertension': request.POST.get('hypertension', ''),
+                'heart_disease': request.POST.get('heart_disease', ''),
+                'hba1c_level': request.POST.get('hba1c_level', ''),
+                'blood_glucose_level': request.POST.get('blood_glucose_level', ''),
+                'smoking_history': request.POST.get('smoking_history', '')
+            }
+            return render(request, 'aplicacion.html', context)
         except Exception as e:
             print(f"Error durante la predicción: {str(e)}")
-            return render(request, 'aplicacion.html', {'error': 'Ocurrió un error durante la predicción.'})
+            context = {
+                'error': 'Ocurrió un error durante la predicción.',
+                'rut': request.POST.get('rut', ''),
+                'nombre': request.POST.get('nombre', ''),
+                'apellido': request.POST.get('apellido', ''),
+                'age': request.POST.get('age', ''),
+                'nacimiento': request.POST.get('nacimiento', ''),
+                'gender': request.POST.get('gender', ''),
+                'bmi': request.POST.get('bmi', ''),
+                'hypertension': request.POST.get('hypertension', ''),
+                'heart_disease': request.POST.get('heart_disease', ''),
+                'hba1c_level': request.POST.get('hba1c_level', ''),
+                'blood_glucose_level': request.POST.get('blood_glucose_level', ''),
+                'smoking_history': request.POST.get('smoking_history', '')
+            }
+            return render(request, 'aplicacion.html', context)
 
     return render(request, 'aplicacion.html')
 
@@ -595,14 +670,34 @@ def evaluacion_riesgo(request):
 
             nivel_riesgo_general = calcular_nivel_riesgo_general(rf_proba, svm_risk[0], logistic_proba)
 
+            # Buscar los datos del paciente para conservarlos en el formulario
+            rut_paciente = request.POST.get('rut')
+            paciente = None
+            if rut_paciente:
+                try:
+                    paciente = Paciente.objects.get(rut=rut_paciente)
+                except Paciente.DoesNotExist:
+                    paciente = None
+
             context = {
+                # Datos de predicción
                 'rf_prediction': round(rf_proba, 2),
                 'svm_prediction': round(svm_risk[0], 2),
                 'logistic_prediction': round(logistic_proba, 2),
                 'blood_glucose_level': blood_glucose_level,
                 'HbA1c_level': Hba1c_level,
                 'hypertension': hypertension,
-                'nivel_riesgo_general': nivel_riesgo_general  # 👈 aquí lo pasamos al template
+                'nivel_riesgo_general': nivel_riesgo_general,
+                # Datos del paciente para conservar en el formulario
+                'paciente': paciente,
+                'nombre': paciente.nombre if paciente else '',
+                'apellido': paciente.apellido if paciente else '',
+                'age': age,
+                'gender': gender,
+                'bmi': bmi,
+                'heart_disease': heart_disease,
+                'hba1c_level': Hba1c_level,
+                'smoking_history': smoking_history
             }
 
             return render(request, 'consulta.html', context)
