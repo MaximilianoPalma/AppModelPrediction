@@ -59,7 +59,9 @@ scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 # Dividir en train/test
-X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.3, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(
+    X_scaled, y, test_size=0.3, random_state=42
+)
 
 # Aplicar SMOTE para balancear clases
 smote = SMOTE(random_state=42)
@@ -79,7 +81,9 @@ classifiers = {
 
 for name, clf in classifiers.items():
     clf.fit(X_train_resampled, y_train_resampled)
-    model_path = os.path.join(base_dir, 'algoritmos', f'{name.lower().replace(" ", "_")}_model.pkl')
+    model_path = os.path.join(
+        base_dir, 'algoritmos', f'{name.lower().replace(" ", "_")}_model.pkl'
+    )
     joblib.dump(clf, model_path)
     print(f"Modelo {name} guardado en: {model_path}")
 
