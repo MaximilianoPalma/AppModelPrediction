@@ -16,7 +16,6 @@ urlpatterns = [
     
     path('listado/', login_required(views.listado_pacientes), name='listado_pacientes'),
     path('registro/', views.registro_paciente, name='registro_paciente'),
-    path('verificar-rut/', views.verificar_rut, name='verificar_rut'),
     path('consulta/', views.consulta_paciente, name='consulta_paciente'),
     
     path('editar_paciente/<int:paciente_id>/', views.editar_paciente, name='editar_paciente'),

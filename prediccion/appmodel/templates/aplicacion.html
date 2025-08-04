@@ -11,86 +11,80 @@
     
         <div class="tab-group">
             <label for="rut">RUT:</label>
-            <input type="text" id="rut" name="rut" placeholder="Ingrese RUT" value="{{ rut|default_if_none:'' }}" required>
-            <div id="rut-error" class="error-message {% if error_rut %}show{% else %}hide{% endif %}">
-                {% if error_rut %}{{ error_rut }}{% endif %}
-            </div>
-            <div id="rut-success" class="success-message hide">
-                RUT disponible
-            </div>
+            <input type="text" id="rut" name="rut" placeholder="Ingrese RUT" required>
         </div>
     
         <div class="tab-group">
             <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" placeholder="Ingrese nombre" value="{{ nombre|default_if_none:'' }}" required>
+            <input type="text" id="nombre" name="nombre" placeholder="Ingrese nombre" required>
         </div>
     
         <div class="tab-group">
             <label for="apellido">Apellido:</label>
-            <input type="text" id="apellido" name="apellido" placeholder="Ingrese apellido" value="{{ apellido|default_if_none:'' }}" required>
+            <input type="text" id="apellido" name="apellido" placeholder="Ingrese apellido" required>
         </div>
     
         <div class="tab-group">
             <label for="age">Edad:</label>
-            <input type="number" id="age" name="age" min="0" max="120" placeholder="Ingrese la edad" value="{{ age|default_if_none:'' }}" required>
+            <input type="number" id="age" name="age" min="0" max="120" placeholder="Ingrese la edad" required>
         </div>
     
         <div class="tab-group">
             <label for="nacimiento">Fecha de nacimiento:</label>
-            <input type="text" id="nacimiento" name="nacimiento" value="{{ nacimiento|default_if_none:'' }}" required>
+            <input type="text" id="nacimiento" name="nacimiento" required>
         </div>
 
         <div class="tab-group">
             <label for="gender">Género:</label>
             <select id="gender" name="gender" required>
-                <option value="" disabled {% if not gender %}selected{% endif %}>Seleccione una opción</option>
-                <option value="1" {% if gender == '1' or gender == 1 %}selected{% endif %}>Hombre</option>
-                <option value="0" {% if gender == '0' or gender == 0 %}selected{% endif %}>Mujer</option>
-                <option value="2" {% if gender == '2' or gender == 2 %}selected{% endif %}>Otro</option>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="1">Hombre</option>
+                <option value="0">Mujer</option>
+                <option value="2">Otro</option>
             </select>
         </div>
     
         <div class="tab-group">
             <label for="bmi">Índice de Masa Corporal (BMI):</label>
-            <input type="number" step="0.01" id="bmi" name="bmi" min="0" placeholder="Ingrese el BMI" value="{{ bmi|default_if_none:'' }}" required>
+            <input type="number" step="0.01" id="bmi" name="bmi" min="0" placeholder="Ingrese el BMI" required>
         </div>
     
         <div class="tab-group">
             <label for="hypertension">Hipertensión:</label>
             <select id="hypertension" name="hypertension" required>
-                <option value="" disabled {% if not hypertension %}selected{% endif %}>Seleccione una opción</option>
-                <option value="1" {% if hypertension == '1' or hypertension == 1 %}selected{% endif %}>Sí</option>
-                <option value="0" {% if hypertension == '0' or hypertension == 0 %}selected{% endif %}>No</option>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="1">Sí</option>
+                <option value="0">No</option>
             </select>
         </div>
     
         <div class="tab-group">
             <label for="heart_disease">Enfermedad Cardiaca:</label>
             <select id="heart_disease" name="heart_disease" required>
-                <option value="" disabled {% if not heart_disease %}selected{% endif %}>Seleccione una opción</option>
-                <option value="1" {% if heart_disease == '1' or heart_disease == 1 %}selected{% endif %}>Sí</option>
-                <option value="0" {% if heart_disease == '0' or heart_disease == 0 %}selected{% endif %}>No</option>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="1">Sí</option>
+                <option value="0">No</option>
             </select>
         </div>
     
         <div class="tab-group">
             <label for="hba1c_level">Nivel de HbA1c:</label>
-            <input type="number" step="0.01" id="hba1c_level" name="hba1c_level" min="0" placeholder="Ingrese el nivel de HbA1c" value="{{ hba1c_level|default_if_none:'' }}" required>
+            <input type="number" step="0.01" id="hba1c_level" name="hba1c_level" min="0" placeholder="Ingrese el nivel de HbA1c" required>
         </div>
     
         <div class="tab-group">
             <label for="blood_glucose_level">Nivel de Glucosa en Sangre:</label>
-            <input type="number" step="0.01" id="blood_glucose_level" name="blood_glucose_level" min="0" placeholder="Ingrese el nivel de glucosa" value="{{ blood_glucose_level|default_if_none:'' }}" required>
+            <input type="number" step="0.01" id="blood_glucose_level" name="blood_glucose_level" min="0" placeholder="Ingrese el nivel de glucosa" required>
         </div>
     
         <div class="tab-group">
             <label for="smoking_history">Historial de Tabaquismo:</label>
             <select id="smoking_history" name="smoking_history" required>
-                <option value="" disabled {% if not smoking_history %}selected{% endif %}>Seleccione una opción</option>
-                <option value="0" {% if smoking_history == '0' or smoking_history == 0 %}selected{% endif %}>Nunca</option>
-                <option value="1" {% if smoking_history == '1' or smoking_history == 1 %}selected{% endif %}>Ex-fumador</option>
-                <option value="2" {% if smoking_history == '2' or smoking_history == 2 %}selected{% endif %}>Fumador ocasional</option>
-                <option value="3" {% if smoking_history == '3' or smoking_history == 3 %}selected{% endif %}>Fumador habitual</option>
+                <option value="" disabled selected>Seleccione una opción</option>
+                <option value="0">Nunca</option>
+                <option value="1">Ex-fumador</option>
+                <option value="2">Fumador ocasional</option>
+                <option value="3">Fumador habitual</option>
            </select>
         </div>
     
@@ -103,7 +97,6 @@
     </form>
 </div>
 
-{% if rf_prediction %}
 <div class="form-register-container">
     <h2>Resultados de la Predicción</h2>
 
@@ -219,87 +212,12 @@
         </div>
     </div>
 </div>
-{% endif %}
 
 
 <script>
     $(function() {
         $("#nacimiento").datepicker({
             dateFormat: "dd-mm-yy"
-        });
-
-        // Mostrar error del servidor si existe
-        {% if error_rut %}
-        $('#rut-error').text('{{ error_rut }}').removeClass('hide').addClass('show');
-        $('#rut').addClass('input-error');
-        {% endif %}
-
-        // Mostrar popup de éxito si se registró
-        {% if registro_exitoso %}
-        alert('¡Paciente registrado exitosamente! RUT: {{ rut }}');
-        {% endif %}
-    });
-
-    // Variable para controlar el timeout
-    let rutTimeout;
-
-    // Función para verificar RUT en tiempo real
-    function verificarRUT() {
-        const rut = $('#rut').val().trim();
-        
-        // Limpiar mensajes previos
-        $('#rut-error').removeClass('show').addClass('hide');
-        $('#rut-success').removeClass('show').addClass('hide');
-        $('#rut').removeClass('input-error input-success');
-
-        if (rut.length >= 8) { // Mínimo 8 caracteres para un RUT válido
-            // Limpiar timeout anterior
-            clearTimeout(rutTimeout);
-            
-            // Esperar 500ms antes de hacer la consulta
-            rutTimeout = setTimeout(function() {
-                $.ajax({
-                    url: '{% url "verificar_rut" %}',
-                    method: 'GET',
-                    data: { 'rut': rut },
-                    success: function(data) {
-                        if (data.existe) {
-                            $('#rut-error').text('Ya existe un paciente registrado con el RUT ' + data.rut).removeClass('hide').addClass('show');
-                            $('#rut').addClass('input-error');
-                        } else {
-                            $('#rut-success').removeClass('hide').addClass('show');
-                            $('#rut').addClass('input-success');
-                        }
-                    },
-                    error: function() {
-                        console.log('Error al verificar RUT');
-                    }
-                });
-            }, 500);
-        }
-    }
-
-    // Agregar event listener al campo RUT
-    $(document).ready(function() {
-        $('#rut').on('input', verificarRUT);
-        
-        // Validar antes de enviar el formulario
-        $('form').on('submit', function(e) {
-            const action = $('button[type="submit"]:focus').val() || $('input[type="submit"]:focus').val();
-            const rutError = $('#rut-error').hasClass('show');
-            
-            // Solo validar RUT duplicado si la acción es "guardar_analisis"
-            if (action === 'guardar_analisis' && rutError) {
-                e.preventDefault();
-                alert('No se puede registrar: Ya existe un paciente con este RUT. Use "Solo análisis" para continuar sin registrar.');
-                return false;
-            }
-        });
-
-        // Capturar qué botón fue presionado
-        $('button[type="submit"]').on('click', function() {
-            $('button[type="submit"]').blur();
-            $(this).focus();
         });
     });
 
@@ -318,6 +236,7 @@
         document.getElementById('rut').value = '';
         document.getElementById('nombre').value = '';
         document.getElementById('apellido').value = '';
+        document.getElementById('rut_hidden').value = '';
         document.getElementById('age').value = '';
         document.getElementById('gender').selectedIndex = 0;
         document.getElementById('bmi').value = '';
@@ -327,58 +246,8 @@
         document.getElementById('blood_glucose_level').value = '';
         document.getElementById('smoking_history').selectedIndex = 0;
         document.getElementById('nacimiento').value = '';
-        
-        // Limpiar mensajes de validación
-        $('#rut-error').removeClass('show').addClass('hide');
-        $('#rut-success').removeClass('show').addClass('hide');
-        $('#rut').removeClass('input-error input-success');
-        
-        // Limpiar resultados si existe el elemento
-        const resultados = document.getElementById('resultados-prediccion');
-        if (resultados) {
-            resultados.innerHTML = '';
-        }
+        document.getElementById('resultados-prediccion').innerHTML = '';
     }
 </script>
-
-<style>
-    .input-error {
-        border: 2px solid #dc3545 !important;
-        background-color: #fff5f5 !important;
-    }
-    
-    .input-success {
-        border: 2px solid #28a745 !important;
-        background-color: #f5fff5 !important;
-    }
-    
-    .error-message {
-        background-color: #f8d7da;
-        border: 1px solid #f5c6cb;
-        color: #721c24;
-        padding: 5px 10px;
-        border-radius: 4px;
-        font-size: 14px;
-        margin-top: 5px;
-    }
-    
-    .success-message {
-        background-color: #d4edda;
-        border: 1px solid #c3e6cb;
-        color: #155724;
-        padding: 5px 10px;
-        border-radius: 4px;
-        font-size: 14px;
-        margin-top: 5px;
-    }
-    
-    .show {
-        display: block !important;
-    }
-    
-    .hide {
-        display: none !important;
-    }
-</style>
 
 {% endblock %}
