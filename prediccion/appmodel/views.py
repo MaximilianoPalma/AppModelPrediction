@@ -385,6 +385,15 @@ def enviar_reporte(request, paciente_id):
 
 @login_required
 def aplicacion(request):
+    def calcular_nivel_riesgo_general(rf, svm, lr):
+        promedio = (rf + svm + lr) / 3
+        if promedio <= 30:
+            return "bajo"
+        elif promedio <= 60:
+            return "medio"
+        else:
+            return "alto"
+
     if request.method == 'POST':
         action = request.POST.get('action')
         try:
@@ -436,13 +445,30 @@ def aplicacion(request):
             logistic_proba = logistic_model.predict_proba(input_data_scaled)[0][1] * 100
             svm_risk = (1 / (1 + np.exp(-svm_proba))) * 100
 
+            nivel_riesgo_general = calcular_nivel_riesgo_general(rf_proba, svm_risk[0], logistic_proba)
+
             context = {
+                # Mantener datos del formulario
+                'rut': rut,
+                'nombre': nombre,
+                'apellido': apellido,
+                'age': age,
+                'nacimiento': nacimiento,
+                'gender': gender,
+                'bmi': bmi,
+                'hypertension': hypertension,
+                'heart_disease': heart_disease,
+                'hba1c_level': hba1c_level,
+                'blood_glucose_level': blood_glucose_level,
+                'smoking_history': smoking_history,
+                
+                # Resultados de predicción
                 'rf_prediction': round(rf_proba, 2),
                 'svm_prediction': round(svm_risk[0], 2),
                 'logistic_prediction': round(logistic_proba, 2),
-                'blood_glucose_level': blood_glucose_level,
-                'hba1c_level': hba1c_level,
-                'hypertension': hypertension
+                'HbA1c_level': hba1c_level,
+                'nivel_riesgo_general': nivel_riesgo_general,
+                'prediccion_realizada': True  # Flag para mostrar resultados
             }
 
             if action == 'guardar_analisis':
@@ -539,6 +565,16 @@ def evaluacion_riesgo(request):
 
     if request.method == 'POST':
         try:
+            # Obtener el RUT para recuperar los datos del paciente
+            rut = request.POST.get('rut')
+            paciente = None
+            
+            if rut:
+                try:
+                    paciente = Paciente.objects.get(rut=rut)
+                except Paciente.DoesNotExist:
+                    pass
+
             age = int(request.POST.get('age'))
             gender = request.POST.get('gender')
             hypertension = int(request.POST.get('hypertension'))
@@ -579,13 +615,26 @@ def evaluacion_riesgo(request):
             nivel_riesgo_general = calcular_nivel_riesgo_general(rf_proba, svm_risk[0], logistic_proba)
 
             context = {
+                # Datos del paciente para mantenerlos en pantalla
+                'paciente': paciente,
+                'nombre': paciente.nombre if paciente else '',
+                'apellido': paciente.apellido if paciente else '',
+                'age': age,
+                'gender': gender,
+                'bmi': bmi,
+                'hypertension': hypertension,
+                'heart_disease': heart_disease,
+                'hba1c_level': Hba1c_level,
+                'blood_glucose_level': blood_glucose_level,
+                'smoking_history': smoking_history,
+                
+                # Resultados de la predicción
                 'rf_prediction': round(rf_proba, 2),
                 'svm_prediction': round(svm_risk[0], 2),
                 'logistic_prediction': round(logistic_proba, 2),
-                'blood_glucose_level': blood_glucose_level,
                 'HbA1c_level': Hba1c_level,
-                'hypertension': hypertension,
-                'nivel_riesgo_general': nivel_riesgo_general  # 👈 aquí lo pasamos al template
+                'nivel_riesgo_general': nivel_riesgo_general,
+                'prediccion_realizada': True  # Flag para mostrar resultados
             }
 
             return render(request, 'consulta.html', context)
@@ -723,7 +772,6 @@ def calcular_datos_reporte():
             'fallecidos_semanales': fallecidos_semanales,
         }
 
-        print("✅ Datos calculados:", datos)
         return datos
 
     except Exception as e:
@@ -739,7 +787,6 @@ def calcular_datos_reporte():
             'fallecidos_totales': 0,
             'fallecidos_semanales': 0,
         }
-
 
 @login_required
 def generar_graficos(request):

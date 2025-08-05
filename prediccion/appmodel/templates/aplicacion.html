@@ -11,80 +11,80 @@
     
         <div class="tab-group">
             <label for="rut">RUT:</label>
-            <input type="text" id="rut" name="rut" placeholder="Ingrese RUT" required>
+            <input type="text" id="rut" name="rut" value="{{ rut|default_if_none:'' }}" placeholder="Ingrese RUT" required>
         </div>
     
         <div class="tab-group">
             <label for="nombre">Nombre:</label>
-            <input type="text" id="nombre" name="nombre" placeholder="Ingrese nombre" required>
+            <input type="text" id="nombre" name="nombre" value="{{ nombre|default_if_none:'' }}" placeholder="Ingrese nombre" required>
         </div>
     
         <div class="tab-group">
             <label for="apellido">Apellido:</label>
-            <input type="text" id="apellido" name="apellido" placeholder="Ingrese apellido" required>
+            <input type="text" id="apellido" name="apellido" value="{{ apellido|default_if_none:'' }}" placeholder="Ingrese apellido" required>
         </div>
     
         <div class="tab-group">
             <label for="age">Edad:</label>
-            <input type="number" id="age" name="age" min="0" max="120" placeholder="Ingrese la edad" required>
+            <input type="number" id="age" name="age" value="{{ age|default_if_none:'' }}" min="0" max="120" placeholder="Ingrese la edad" required>
         </div>
     
         <div class="tab-group">
             <label for="nacimiento">Fecha de nacimiento:</label>
-            <input type="text" id="nacimiento" name="nacimiento" required>
+            <input type="text" id="nacimiento" name="nacimiento" value="{{ nacimiento|default_if_none:'' }}" required>
         </div>
 
         <div class="tab-group">
             <label for="gender">Género:</label>
             <select id="gender" name="gender" required>
-                <option value="" disabled selected>Seleccione una opción</option>
-                <option value="1">Hombre</option>
-                <option value="0">Mujer</option>
-                <option value="2">Otro</option>
+                <option value="" disabled {% if not gender %}selected{% endif %}>Seleccione una opción</option>
+                <option value="1" {% if gender == '1' or gender == 1 %}selected{% endif %}>Hombre</option>
+                <option value="0" {% if gender == '0' or gender == 0 %}selected{% endif %}>Mujer</option>
+                <option value="2" {% if gender == '2' or gender == 2 %}selected{% endif %}>Otro</option>
             </select>
         </div>
     
         <div class="tab-group">
             <label for="bmi">Índice de Masa Corporal (BMI):</label>
-            <input type="number" step="0.01" id="bmi" name="bmi" min="0" placeholder="Ingrese el BMI" required>
+            <input type="number" step="0.01" id="bmi" name="bmi" value="{{ bmi|default_if_none:'' }}" min="0" placeholder="Ingrese el BMI" required>
         </div>
     
         <div class="tab-group">
             <label for="hypertension">Hipertensión:</label>
             <select id="hypertension" name="hypertension" required>
-                <option value="" disabled selected>Seleccione una opción</option>
-                <option value="1">Sí</option>
-                <option value="0">No</option>
+                <option value="" disabled {% if not hypertension and hypertension != 0 %}selected{% endif %}>Seleccione una opción</option>
+                <option value="1" {% if hypertension == '1' or hypertension == 1 %}selected{% endif %}>Sí</option>
+                <option value="0" {% if hypertension == '0' or hypertension == 0 %}selected{% endif %}>No</option>
             </select>
         </div>
     
         <div class="tab-group">
             <label for="heart_disease">Enfermedad Cardiaca:</label>
             <select id="heart_disease" name="heart_disease" required>
-                <option value="" disabled selected>Seleccione una opción</option>
-                <option value="1">Sí</option>
-                <option value="0">No</option>
+                <option value="" disabled {% if not heart_disease and heart_disease != 0 %}selected{% endif %}>Seleccione una opción</option>
+                <option value="1" {% if heart_disease == '1' or heart_disease == 1 %}selected{% endif %}>Sí</option>
+                <option value="0" {% if heart_disease == '0' or heart_disease == 0 %}selected{% endif %}>No</option>
             </select>
         </div>
     
         <div class="tab-group">
             <label for="hba1c_level">Nivel de HbA1c:</label>
-            <input type="number" step="0.01" id="hba1c_level" name="hba1c_level" min="0" placeholder="Ingrese el nivel de HbA1c" required>
+            <input type="number" step="0.01" id="hba1c_level" name="hba1c_level" value="{{ hba1c_level|default_if_none:'' }}" min="0" placeholder="Ingrese el nivel de HbA1c" required>
         </div>
     
         <div class="tab-group">
             <label for="blood_glucose_level">Nivel de Glucosa en Sangre:</label>
-            <input type="number" step="0.01" id="blood_glucose_level" name="blood_glucose_level" min="0" placeholder="Ingrese el nivel de glucosa" required>
+            <input type="number" step="0.01" id="blood_glucose_level" name="blood_glucose_level" value="{{ blood_glucose_level|default_if_none:'' }}" min="0" placeholder="Ingrese el nivel de glucosa" required>
         </div>
     
         <div class="tab-group">
             <label for="smoking_history">Historial de Tabaquismo:</label>
             <select id="smoking_history" name="smoking_history" required>
-                <option value="" disabled selected>Seleccione una opción</option>
-                <option value="0">Nunca</option>
-                <option value="1">Ex-fumador</option>
-                <option value="2">Fumador ocasional</option>
-                <option value="3">Fumador habitual</option>
+                <option value="" disabled {% if not smoking_history and smoking_history != 0 %}selected{% endif %}>Seleccione una opción</option>
+                <option value="0" {% if smoking_history == '0' or smoking_history == 0 %}selected{% endif %}>Nunca</option>
+                <option value="1" {% if smoking_history == '1' or smoking_history == 1 %}selected{% endif %}>Ex-fumador</option>
+                <option value="2" {% if smoking_history == '2' or smoking_history == 2 %}selected{% endif %}>Fumador ocasional</option>
+                <option value="3" {% if smoking_history == '3' or smoking_history == 3 %}selected{% endif %}>Fumador habitual</option>
            </select>
         </div>
     
@@ -97,6 +97,7 @@
     </form>
 </div>
 
+{% if prediccion_realizada %}
 <div class="form-register-container">
     <h2>Resultados de la Predicción</h2>
 
@@ -188,8 +189,8 @@
             {% if logistic_prediction > 30 %}
             <p><strong>Factores relevantes:</strong></p>
             <ul>
-                {% if smoking_history == 'current' %}
-                <li>Historial de tabaquismo (fumador actual)</li>
+                {% if smoking_history == '3' or smoking_history == 3 %}
+                <li>Historial de tabaquismo (fumador habitual)</li>
                 {% endif %}
                 {% if HbA1c_level > 6.5 %}
                 <li>Niveles elevados de HbA1c</li>
@@ -202,7 +203,7 @@
             <!-- Plan de acción específico para Regresión Logística -->
             <div class="recomendacion">
                 <h4>Plan de Acción (Regresión Logística)</h4>
-                {% if smoking_history == 'current' %}
+                {% if smoking_history == '3' or smoking_history == 3 %}
                 <p><strong>Tabaquismo:</strong> Considerar dejar de fumar y buscar apoyo médico.</p>
                 {% endif %}
                 {% if HbA1c_level > 6.5 %}
@@ -212,6 +213,55 @@
         </div>
     </div>
 </div>
+
+<!-- 🔻 BLOQUE FINAL: PLAN DE RECOMENDACIÓN GENERAL -->
+<div class="form-register-container" style="margin-top: 40px;">
+    <h2 style="text-align:center;">🧭 Plan de Recomendación General</h2>
+
+    {% if nivel_riesgo_general == "bajo" %}
+    <p style="text-align:center;">Riesgo bajo detectado. Mantener hábitos saludables es clave para prevenir.</p>
+    {% elif nivel_riesgo_general == "medio" %}
+    <p style="text-align:center;">Riesgo moderado. Se recomienda control médico preventivo y ajuste de hábitos.</p>
+    {% elif nivel_riesgo_general == "alto" %}
+    <p style="text-align:center; font-weight: bold;">Riesgo alto. Derivación médica inmediata recomendada.</p>
+    {% endif %}
+
+    <div style="display: flex; justify-content: space-around; flex-wrap: wrap; margin-top: 20px;">
+        <div style="background-color: #e0f7e9; border-radius: 10px; padding: 20px; width: 280px; text-align: center; margin: 10px;">
+            <h4>🥗 Alimentación Saludable</h4>
+            {% if nivel_riesgo_general == "bajo" %}
+            <p>Continúa con una dieta equilibrada rica en vegetales, frutas y fibra.</p>
+            {% elif nivel_riesgo_general == "medio" %}
+            <p>Reduce azúcar y harinas refinadas. Prioriza alimentos frescos.</p>
+            {% elif nivel_riesgo_general == "alto" %}
+            <p>Requiere planificación nutricional supervisada. Consulta con nutricionista.</p>
+            {% endif %}
+        </div>
+
+        <div style="background-color: #e7f0ff; border-radius: 10px; padding: 20px; width: 280px; text-align: center; margin: 10px;">
+            <h4>🏃 Actividad Física</h4>
+            {% if nivel_riesgo_general == "bajo" %}
+            <p>Ejercicio moderado 3-5 veces por semana. Mantén el movimiento.</p>
+            {% elif nivel_riesgo_general == "medio" %}
+            <p>Inicia rutina regular de 30 minutos diarios. Evita el sedentarismo.</p>
+            {% elif nivel_riesgo_general == "alto" %}
+            <p>Debe ser evaluada por médico. Comienza con caminatas y evaluación funcional.</p>
+            {% endif %}
+        </div>
+
+        <div style="background-color: #ffeaea; border-radius: 10px; padding: 20px; width: 280px; text-align: center; margin: 10px;">
+            <h4>🩺 Control de la Diabetes</h4>
+            {% if nivel_riesgo_general == "bajo" %}
+            <p>Chequeo anual suficiente si no hay síntomas.</p>
+            {% elif nivel_riesgo_general == "medio" %}
+            <p>Controles cada 3-6 meses. Monitoreo de glucosa y presión arterial.</p>
+            {% elif nivel_riesgo_general == "alto" %}
+            <p>Derivación inmediata a endocrinología. Evaluación urgente de HbA1c y glucosa.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
 
 
 <script>
@@ -233,10 +283,10 @@
     });
 
     function limpiarFormulario() {
+        // Limpiar todos los campos del formulario
         document.getElementById('rut').value = '';
         document.getElementById('nombre').value = '';
         document.getElementById('apellido').value = '';
-        document.getElementById('rut_hidden').value = '';
         document.getElementById('age').value = '';
         document.getElementById('gender').selectedIndex = 0;
         document.getElementById('bmi').value = '';
@@ -246,7 +296,9 @@
         document.getElementById('blood_glucose_level').value = '';
         document.getElementById('smoking_history').selectedIndex = 0;
         document.getElementById('nacimiento').value = '';
-        document.getElementById('resultados-prediccion').innerHTML = '';
+        
+        // Recargar la página para eliminar los resultados de predicción
+        window.location.href = window.location.pathname;
     }
 </script>
 
