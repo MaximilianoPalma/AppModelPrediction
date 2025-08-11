@@ -11,7 +11,9 @@
     
         <div class="tab-group">
             <label for="rut">RUT:</label>
-            <input type="text" id="rut" name="rut" value="{{ rut|default_if_none:'' }}" placeholder="Ingrese RUT" required>
+            <input type="text" id="rut" name="rut" value="{{ rut|default_if_none:'' }}" placeholder="Ingrese RUT (ej: 12.345.678-9)" required>
+            <div id="rut-error" class="error-message hide"></div>
+            <div id="rut-success" class="success-message hide">✓ RUT disponible para registro</div>
         </div>
     
         <div class="tab-group">
@@ -269,6 +271,80 @@
         $("#nacimiento").datepicker({
             dateFormat: "dd-mm-yy"
         });
+
+        // Mostrar error del servidor si existe
+        {% if error_rut %}
+        $('#rut-error').text('{{ error_rut }}').removeClass('hide').addClass('show');
+        $('#rut').addClass('input-error');
+        {% endif %}
+
+        // Mostrar popup de éxito si se registró
+        {% if registro_exitoso %}
+        alert('¡Paciente registrado exitosamente! RUT: {{ rut }}');
+        {% endif %}
+    });
+
+    // Variable para controlar el timeout
+    let rutTimeout;
+
+    // Función para verificar RUT en tiempo real
+    function verificarRUT() {
+        const rut = $('#rut').val().trim();
+        
+        // Limpiar mensajes previos
+        $('#rut-error').removeClass('show').addClass('hide');
+        $('#rut-success').removeClass('show').addClass('hide');
+        $('#rut').removeClass('input-error input-success');
+
+        if (rut.length >= 8) { // Mínimo 8 caracteres para un RUT válido
+            // Limpiar timeout anterior
+            clearTimeout(rutTimeout);
+            
+            // Esperar 500ms antes de hacer la consulta
+            rutTimeout = setTimeout(function() {
+                $.ajax({
+                    url: '{% url "verificar_rut" %}',
+                    method: 'GET',
+                    data: { 'rut': rut },
+                    success: function(data) {
+                        if (data.existe) {
+                            $('#rut-error').text('Ya existe un paciente registrado con el RUT ' + data.rut).removeClass('hide').addClass('show');
+                            $('#rut').addClass('input-error');
+                        } else {
+                            $('#rut-success').removeClass('hide').addClass('show');
+                            $('#rut').addClass('input-success');
+                        }
+                    },
+                    error: function() {
+                        console.log('Error al verificar RUT');
+                    }
+                });
+            }, 500);
+        }
+    }
+
+    // Agregar event listener al campo RUT
+    $(document).ready(function() {
+        $('#rut').on('input', verificarRUT);
+        
+        // Validar antes de enviar el formulario
+        $('form').on('submit', function(e) {
+            const action = $('button[type="submit"]:focus').val() || $('input[type="submit"]:focus').val();
+            const rutError = $('#rut-error').hasClass('show');
+            
+            // Solo validar RUT duplicado si la acción es "guardar_analisis"
+            if (action === 'guardar_analisis' && rutError) {
+                e.preventDefault();
+                alert('No se puede registrar: Ya existe un paciente con este RUT. Use "Solo análisis" para continuar sin registrar.');
+                return false;
+            }
+        });
+
+        // Capturar qué botón fue presionado
+        $('button[type="submit"]').on('click', function() {
+            $('button[type="submit"]').blur();
+            $(this).focus();
+        });
     });
 
     document.querySelector("form").addEventListener("submit", function(event) {
@@ -283,7 +359,6 @@
     });
 
     function limpiarFormulario() {
-        // Limpiar todos los campos del formulario
         document.getElementById('rut').value = '';
         document.getElementById('nombre').value = '';
         document.getElementById('apellido').value = '';
@@ -297,9 +372,57 @@
         document.getElementById('smoking_history').selectedIndex = 0;
         document.getElementById('nacimiento').value = '';
         
-        // Recargar la página para eliminar los resultados de predicción
-        window.location.href = window.location.pathname;
+        // Limpiar mensajes de validación
+        $('#rut-error').removeClass('show').addClass('hide');
+        $('#rut-success').removeClass('show').addClass('hide');
+        $('#rut').removeClass('input-error input-success');
+        
+        // Limpiar resultados si existe el elemento
+        const resultados = document.getElementById('resultados-prediccion');
+        if (resultados) {
+            resultados.innerHTML = '';
+        }
     }
 </script>
+
+<style>
+    .input-error {
+        border: 2px solid #dc3545 !important;
+        background-color: #fff5f5 !important;
+    }
+    
+    .input-success {
+        border: 2px solid #28a745 !important;
+        background-color: #f5fff5 !important;
+    }
+    
+    .error-message {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    
+    .success-message {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    
+    .show {
+        display: block !important;
+    }
+    
+    .hide {
+        display: none !important;
+    }
+</style>
 
 {% endblock %}

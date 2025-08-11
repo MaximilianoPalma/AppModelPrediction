@@ -11,7 +11,9 @@
         {% csrf_token %}
         <div class="form-group">
             <label for="rut">RUT:</label>
-            <input type="text" id="rut" name="rut" value="{{ paciente.rut|default_if_none:'' }}" placeholder="Ingrese RUT" required>
+            <input type="text" id="rut" name="rut" value="{{ paciente.rut|default_if_none:'' }}" placeholder="Ingrese RUT (ej: 12.345.678-9)" required>
+            <div id="rut-error" class="error-message hide"></div>
+            <div id="rut-success" class="success-message hide">✓ RUT encontrado en el sistema</div>
         </div>
 
         <div class="form-group">
@@ -119,24 +121,9 @@
                 <div class="circulo {% if rf_prediction > 60 %}rojo{% else %}apagado{% endif %}"></div>
             </div>
             <p><strong>Riesgo Predicho:</strong> {{ rf_prediction|floatformat:2 }}%</p>
-            {% if rf_prediction > 30 %}
-            <p><strong>Factores relevantes:</strong></p>
-            <ul>
-                {% if blood_glucose_level > 125 %}
-                <li>Glucosa elevada (contribuye al riesgo)</li>
-                {% endif %}
-                {% if bmi > 25 %}
-                <li>IMC alto (sobrepeso u obesidad)</li>
-                {% endif %}
-                {% if age > 60 %}
-                <li>Edad avanzada</li>
-                {% endif %}
-            </ul>
-            {% else %}
-            <p>El riesgo es bajo, mantén hábitos saludables para prevenir la enfermedad.</p>
-            {% endif %}
+
             <div class="recomendacion">
-                <h4>Plan de Acción (Random Forest)</h4>
+                <h4>Factores Relevantes (Random Forest)</h4>
                 {% if blood_glucose_level > 125 %}
                 <p><strong>Glucosa elevada:</strong> Recomendamos una consulta con un endocrinólogo y un monitoreo diario de la glucosa.</p>
                 {% endif %}
@@ -155,21 +142,9 @@
                 <div class="circulo {% if svm_prediction > 60 %}rojo{% else %}apagado{% endif %}"></div>
             </div>
             <p><strong>Riesgo Predicho:</strong> {{ svm_prediction|floatformat:2 }}%</p>
-            {% if svm_prediction > 30 %}
-            <p><strong>Factores relevantes:</strong></p>
-            <ul>
-                {% if blood_glucose_level > 125 %}
-                <li>Glucosa elevada</li>
-                {% endif %}
-                {% if hypertension %}
-                <li>Hipertensión</li>
-                {% endif %}
-            </ul>
-            {% else %}
-            <p>El riesgo es bajo, sigue con hábitos saludables.</p>
-            {% endif %}
+            
             <div class="recomendacion">
-                <h4>Plan de Acción (SVM)</h4>
+                <h4>Factores Relevantes (SVM)</h4>
                 {% if blood_glucose_level > 125 %}
                 <p><strong>Glucosa elevada:</strong> Controlar la ingesta de carbohidratos y consultar a un médico.</p>
                 {% endif %}
@@ -188,21 +163,9 @@
                 <div class="circulo {% if logistic_prediction > 60 %}rojo{% else %}apagado{% endif %}"></div>
             </div>
             <p><strong>Riesgo Predicho:</strong> {{ logistic_prediction|floatformat:2 }}%</p>
-            {% if logistic_prediction > 30 %}
-            <p><strong>Factores relevantes:</strong></p>
-            <ul>
-                {% if smoking_history == '3' or smoking_history == 3 %}
-                <li>Historial de tabaquismo (fumador habitual)</li>
-                {% endif %}
-                {% if HbA1c_level > 6.5 %}
-                <li>Niveles elevados de HbA1c</li>
-                {% endif %}
-            </ul>
-            {% else %}
-            <p>El riesgo es bajo. Continúa con hábitos saludables.</p>
-            {% endif %}
+            
             <div class="recomendacion">
-                <h4>Plan de Acción (Regresión Logística)</h4>
+                <h4>Factores Relevantes (Regresión Logística)</h4>
                 {% if smoking_history == '3' or smoking_history == 3 %}
                 <p><strong>Tabaquismo:</strong> Considerar dejar de fumar y buscar apoyo médico.</p>
                 {% endif %}
@@ -267,26 +230,128 @@
 
 
 <script>
-function limpiarFormulario() {
-    // Limpiar datos de búsqueda
-    document.getElementById('rut').value = '';
-    document.getElementById('nombre').value = '';
-    document.getElementById('apellido').value = '';
+    // Variable para controlar el timeout
+    let rutTimeout;
 
-    // Limpiar datos del paciente
-    document.getElementById('rut_hidden').value = '';
-    document.getElementById('age').value = '';
-    document.getElementById('gender').selectedIndex = 0;
-    document.getElementById('bmi').value = '';
-    document.getElementById('hypertension').selectedIndex = 0;
-    document.getElementById('heart_disease').selectedIndex = 0;
-    document.getElementById('HbA1c_level').value = '';
-    document.getElementById('blood_glucose_level').value = '';
-    document.getElementById('smoking_history').selectedIndex = 0;
+    // Función para verificar RUT en tiempo real (para consulta - busca si EXISTE)
+    function verificarRUTConsulta() {
+        const rut = $('#rut').val().trim();
+        
+        // Limpiar mensajes previos
+        $('#rut-error').removeClass('show').addClass('hide');
+        $('#rut-success').removeClass('show').addClass('hide');
+        $('#rut').removeClass('input-error input-success');
 
-    // Recargar la página para eliminar los resultados de predicción
-    window.location.href = window.location.pathname;
-}
+        if (rut.length >= 8) { // Mínimo 8 caracteres para un RUT válido
+            // Limpiar timeout anterior
+            clearTimeout(rutTimeout);
+            
+            // Esperar 500ms antes de hacer la consulta
+            rutTimeout = setTimeout(function() {
+                $.ajax({
+                    url: '{% url "verificar_rut" %}',
+                    method: 'GET',
+                    data: { 'rut': rut },
+                    success: function(data) {
+                        if (data.existe) {
+                            $('#rut-success').removeClass('hide').addClass('show');
+                            $('#rut').addClass('input-success');
+                        } else {
+                            $('#rut-error').text('No existe un paciente registrado con el RUT ' + rut).removeClass('hide').addClass('show');
+                            $('#rut').addClass('input-error');
+                        }
+                    },
+                    error: function() {
+                        console.log('Error al verificar RUT');
+                    }
+                });
+            }, 500);
+        }
+    }
+
+    // Document ready
+    $(document).ready(function() {
+        // Agregar validación en tiempo real al campo RUT
+        $('#rut').on('input', verificarRUTConsulta);
+        
+        // Validar antes de enviar el formulario
+        $('#form-busqueda').on('submit', function(e) {
+            const rutError = $('#rut-error').hasClass('show');
+            
+            // Si hay error de RUT (no existe), prevenir el envío
+            if (rutError) {
+                e.preventDefault();
+                alert('No se puede buscar: No existe un paciente con este RUT en el sistema.');
+                return false;
+            }
+        });
+    });
+
+    function limpiarFormulario() {
+        // Limpiar datos de búsqueda
+        document.getElementById('rut').value = '';
+        document.getElementById('nombre').value = '';
+        document.getElementById('apellido').value = '';
+
+        // Limpiar datos del paciente
+        document.getElementById('rut_hidden').value = '';
+        document.getElementById('age').value = '';
+        document.getElementById('gender').selectedIndex = 0;
+        document.getElementById('bmi').value = '';
+        document.getElementById('hypertension').selectedIndex = 0;
+        document.getElementById('heart_disease').selectedIndex = 0;
+        document.getElementById('HbA1c_level').value = '';
+        document.getElementById('blood_glucose_level').value = '';
+        document.getElementById('smoking_history').selectedIndex = 0;
+
+        // Limpiar mensajes de validación
+        $('#rut-error').removeClass('show').addClass('hide');
+        $('#rut-success').removeClass('show').addClass('hide');
+        $('#rut').removeClass('input-error input-success');
+
+        // Recargar la página para eliminar los resultados de predicción
+        window.location.href = window.location.pathname;
+    }
 </script>
+
+<style>
+    .input-error {
+        border: 2px solid #dc3545 !important;
+        background-color: #fff5f5 !important;
+    }
+    
+    .input-success {
+        border: 2px solid #28a745 !important;
+        background-color: #f5fff5 !important;
+    }
+    
+    .error-message {
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        color: #721c24;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    
+    .success-message {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        color: #155724;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-size: 14px;
+        margin-top: 5px;
+    }
+    
+    .show {
+        display: block !important;
+    }
+    
+    .hide {
+        display: none !important;
+    }
+</style>
 
 {% endblock %}

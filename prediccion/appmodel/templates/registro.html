@@ -34,7 +34,9 @@
 
         <div class="form-group">
             <label for="rut">RUT:</label>
-            <input type="text" id="rut" name="rut" placeholder="Ingrese RUT" required>
+            <input type="text" id="rut" name="rut" placeholder="Ingrese RUT (ej: 12.345.678-9)" required>
+            <div id="rut-error" class="error-message" style="display:none"></div>
+            <div id="rut-success" class="success-message" style="display:none">✓ RUT disponible para registro</div>
         </div>
 
         <div class="form-group">
@@ -128,6 +130,112 @@
     $(function() {
         $("#nacimiento").datepicker({
             dateFormat: "dd-mm-yy"
+        });
+    });
+
+    // Validación de RUT en tiempo real (sin mensajes pegados)
+    let rutTimeout;
+    let lastXhr = null;
+    let reqSeq = 0;
+
+    function clearRutUI() {
+        $('#rut-error').hide().text('');
+        $('#rut-success').hide();
+        $('#rut').removeClass('input-error input-success');
+    }
+
+    function verificarRUT() {
+        const $rut = $('#rut');
+        const valor = ($rut.val() || '').trim();
+
+        // Limpiar de inmediato en cada cambio
+        clearRutUI();
+
+        // Cancelar solicitud anterior si sigue en curso
+        if (lastXhr && lastXhr.readyState !== 4) {
+            lastXhr.abort();
+        }
+
+        if (valor.length < 8) return; // evitar consultas con entradas muy cortas
+
+        clearTimeout(rutTimeout);
+        const seq = ++reqSeq;
+        rutTimeout = setTimeout(function() {
+            lastXhr = $.ajax({
+                url: '{% url "verificar_rut" %}',
+                method: 'GET',
+                data: { rut: valor },
+                success: function(data) {
+                    // Ignorar respuestas tardías o si el valor cambió
+                    if (seq !== reqSeq) return;
+                    if (($('#rut').val() || '').trim() !== valor) return;
+
+                    if (data.existe) {
+                        // Solo error visible
+                        $('#rut-success').hide();
+                        $rut.removeClass('input-success');
+                        $('#rut-error').text('Ya existe un paciente registrado con el RUT ' + data.rut).show();
+                        $rut.addClass('input-error');
+                    } else {
+                        // Solo éxito visible
+                        $('#rut-error').hide().text('');
+                        $rut.removeClass('input-error');
+                        $('#rut-success').show();
+                        $rut.addClass('input-success');
+                    }
+                },
+                error: function() { /* ignorar abortados */ }
+            });
+        }, 350);
+    }
+
+    $(document).ready(function() {
+        // Recalcular en cada modificación
+        $('#rut').on('input', verificarRUT);
+        // Revalidar al perder foco
+        $('#rut').on('blur', function() {
+            if (rutTimeout) clearTimeout(rutTimeout);
+            verificarRUT();
+        });
+
+        // Validar al enviar y formatear fecha
+        $('form').on('submit', function(e) {
+            if ($('#rut-error').is(':visible')) {
+                e.preventDefault();
+                alert('No se puede registrar: Ya existe un paciente con este RUT.');
+                return false;
+            }
+        // Normalizar fecha ingresada a DD-MM-YYYY (lo que espera el backend)
+            const f = document.getElementById('nacimiento');
+            if (f && f.value) {
+                let v = f.value.trim();
+                // Si ya está DD-MM-YYYY, ok; si viene con otros separadores, partir por no-dígitos
+                if (!/^\d{2}-\d{2}-\d{4}$/.test(v)) {
+                    const parts = v.split(/\D+/).filter(Boolean);
+                    if (parts.length === 3) {
+                        let [dd, mm, yyyy] = parts;
+                        dd = dd.padStart(2, '0');
+                        mm = mm.padStart(2, '0');
+                        if (yyyy.length === 2) {
+                            // Año de 2 dígitos: intentar siglo actual (opcional)
+                            const y = parseInt(yyyy, 10);
+                            yyyy = (y >= 0 && y <= 30) ? `20${yyyy}` : `19${yyyy}`;
+                        }
+                        if (yyyy.length !== 4) {
+                            alert('Error en el formato de la fecha. Use año con 4 dígitos (YYYY).');
+                            e.preventDefault();
+                            return false;
+                        }
+                v = `${dd}-${mm}-${yyyy}`;
+                    } else if (/^\d{8}$/.test(v)) {
+                        // Caso DDMMYYYY
+                v = `${v.slice(0,2)}-${v.slice(2,4)}-${v.slice(4,8)}`;
+                    }
+                }
+            // Dejarla en DD-MM-YYYY
+            const m = v.match(/^(\d{2})-(\d{2})-(\d{4})$/);
+            if (m) f.value = v;
+            }
         });
     });
 </script>

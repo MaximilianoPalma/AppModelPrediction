@@ -97,6 +97,26 @@ def registro_paciente(request):
         historial_tabaquismo = request.POST['smoking_history']
         observaciones = request.POST['observaciones']
 
+        # Verificar si el RUT ya existe
+        if Paciente.objects.filter(rut=rut).exists():
+            context = {
+                'error_rut': f'Ya existe un paciente registrado con el RUT {rut}',
+                'rut': rut,
+                'nombre': nombre,
+                'apellido': apellido,
+                'edad': edad,
+                'nacimiento': nacimiento,
+                'genero': genero,
+                'bmi': bmi,
+                'hipertension': hipertension,
+                'enfermedad_cardiaca': enfermedad_cardiaca,
+                'nivel_hba1c': nivel_hba1c,
+                'nivel_glucosa': nivel_glucosa,
+                'historial_tabaquismo': historial_tabaquismo,
+                'observaciones': observaciones
+            }
+            return render(request, 'registro.html', context)
+
         try:
             fecha_formateada = datetime.strptime(nacimiento, '%d-%m-%Y').date()
         except ValueError:
@@ -163,11 +183,38 @@ def consulta_paciente(request):
     paciente = None
     if request.method == 'POST':
         rut = request.POST.get('rut')
-        
+        # Normalización mínima y no intrusiva: quitar espacios y subir 'k' a 'K' si es DV
+        if rut is not None:
+            rut = rut.strip()
+            if len(rut) >= 1 and rut[-1].lower() == 'k':
+                rut = rut[:-1] + 'K'
+        # Ajuste mínimo: si el DV es 'k' minúscula, pasarlo a 'K' manteniendo el formato original
+        if rut and len(rut) >= 2 and rut[-1] in ('k', 'K'):
+            rut = rut[:-1] + rut[-1].upper()
+        # Fallback mínimo: si no hay guión, probar con guión antes del DV
+        candidato_con_guion = None
+        if rut and '-' not in rut and len(rut) >= 2:
+            candidato_con_guion = f"{rut[:-1]}-{rut[-1]}"
         try:
             paciente = Paciente.objects.get(rut=rut)
         except Paciente.DoesNotExist:
-            paciente = None
+            # Intento con variante con guión (si aplica)
+            if candidato_con_guion:
+                try:
+                    paciente = Paciente.objects.get(rut=candidato_con_guion)
+                except Paciente.DoesNotExist:
+                    paciente = None
+            else:
+                paciente = None
+            # Respaldo final: comparar por RUT normalizado contra los registrados
+            if paciente is None and rut:
+                def _normalizar(s):
+                    return re.sub(r"[^0-9kK]", "", s).upper()
+                objetivo = _normalizar(rut)
+                for p in Paciente.objects.all():
+                    if _normalizar(p.rut) == objetivo:
+                        paciente = p
+                        break
 
     return render(request, 'consulta.html', {'paciente': paciente})
 
@@ -516,6 +563,15 @@ def consulta_paciente(request):
     paciente = None
     if request.method == 'POST':
         rut = request.POST.get('rut')
+        # Ajuste mínimo: quitar espacios y subir 'k' final a 'K' si corresponde
+        if rut is not None:
+            rut = rut.strip()
+            if len(rut) >= 1 and rut[-1].lower() == 'k':
+                rut = rut[:-1] + 'K'
+        # Fallback mínimo: si no hay guión, probar con guión antes del DV
+        candidato_con_guion = None
+        if rut and '-' not in rut and len(rut) >= 2:
+            candidato_con_guion = f"{rut[:-1]}-{rut[-1]}"
         try:
             paciente = Paciente.objects.get(rut=rut)
 
@@ -534,7 +590,36 @@ def consulta_paciente(request):
                 'smoking_history': paciente.historial_tabaquismo,
             })
         except Paciente.DoesNotExist:
-
+            # Intento con variante con guión (si aplica)
+            if candidato_con_guion:
+                try:
+                    paciente = Paciente.objects.get(rut=candidato_con_guion)
+                except Paciente.DoesNotExist:
+                    paciente = None
+            # Respaldo final: comparar por RUT normalizado contra los registrados
+            if paciente is None and rut:
+                def _normalizar(s):
+                    return re.sub(r"[^0-9kK]", "", s).upper()
+                objetivo = _normalizar(rut)
+                for p in Paciente.objects.all():
+                    if _normalizar(p.rut) == objetivo:
+                        paciente = p
+                        break
+            if paciente:
+                return render(request, 'consulta.html', {
+                    'paciente': paciente,
+                    'nombre': paciente.nombre,
+                    'apellido': paciente.apellido,
+                    'age': paciente.edad,
+                    'nacimiento': paciente.nacimiento,
+                    'gender': paciente.genero,
+                    'bmi': paciente.bmi,
+                    'hypertension': paciente.hipertension,
+                    'heart_disease': paciente.enfermedad_cardiaca,
+                    'hba1c_level': paciente.nivel_hba1c,
+                    'blood_glucose_level': paciente.nivel_glucosa,
+                    'smoking_history': paciente.historial_tabaquismo,
+                })
             return render(request, 'consulta.html', {'error': 'Paciente no encontrado'})
     return render(request, 'consulta.html')
 
@@ -1079,3 +1164,63 @@ def generarGraficos():
         '/static/reportes/grafico_relacion.html',
         '/static/reportes/grafico_enfermedad_renal.html'
     ]
+
+from django.http import JsonResponse
+
+@login_required
+def verificar_rut(request):
+    """Vista para verificar si un RUT ya está registrado"""
+    if request.method == 'GET':
+        rut = request.GET.get('rut', '').strip()
+        
+        if not rut:
+            return JsonResponse({'existe': False, 'rut': rut})
+        
+        # Función para normalizar RUT (eliminar puntos, guiones, espacios y convertir k a mayúscula)
+        def normalizar_rut(rut_input):
+            # Eliminar todo excepto números y K/k
+            solo_numeros_k = re.sub(r'[^0-9kK]', '', rut_input)
+            # Convertir K minúscula a mayúscula
+            return solo_numeros_k.upper()
+        
+        # Función para formatear RUT con puntos y guión
+        def formatear_rut(rut_normalizado):
+            if len(rut_normalizado) >= 8:
+                rut_sin_dv = rut_normalizado[:-1]
+                dv = rut_normalizado[-1]
+                # Agregar puntos cada 3 dígitos desde el final
+                rut_con_puntos = ""
+                for i, digit in enumerate(reversed(rut_sin_dv)):
+                    if i > 0 and i % 3 == 0:
+                        rut_con_puntos = "." + rut_con_puntos
+                    rut_con_puntos = digit + rut_con_puntos
+                return f"{rut_con_puntos}-{dv}"
+            return rut_normalizado
+        
+        # Normalizar el RUT ingresado
+        rut_normalizado = normalizar_rut(rut)
+        rut_formateado = formatear_rut(rut_normalizado)
+        
+        # Buscar en la base de datos
+        try:
+            # Obtener todos los pacientes y normalizar sus RUTs para comparación
+            pacientes = Paciente.objects.all()
+            
+            existe = False
+            rut_encontrado = ""
+            
+            for paciente in pacientes:
+                rut_bd_normalizado = normalizar_rut(paciente.rut)
+                if rut_bd_normalizado == rut_normalizado:
+                    existe = True
+                    rut_encontrado = paciente.rut
+                    break
+            
+            return JsonResponse({
+                'existe': existe,
+                'rut': rut_encontrado if existe else rut_formateado
+            })
+        except Exception as e:
+            return JsonResponse({'existe': False, 'rut': rut, 'error': str(e)})
+    
+    return JsonResponse({'existe': False, 'error': 'Método no permitido'})

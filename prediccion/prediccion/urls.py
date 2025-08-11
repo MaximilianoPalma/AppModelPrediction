@@ -35,6 +35,7 @@ urlpatterns = [
     path('eliminar_soporte/<int:soporte_id>/', views.eliminar_soporte, name='eliminar_soporte'),
     
     path('evaluacion-riesgo/', login_required(views.evaluacion_riesgo), name='evaluacion_riesgo'),
+    path('verificar-rut/', login_required(views.verificar_rut), name='verificar_rut'),
 
     path('descargar-reporte/', views.descargar_reporte, name='descargar_reporte'),
 
