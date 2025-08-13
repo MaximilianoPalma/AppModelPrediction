@@ -441,6 +441,19 @@ def aplicacion(request):
         else:
             return "alto"
 
+    def parse_fecha_flexible(valor):
+        """Acepta 'dd-mm-YYYY' o 'YYYY-mm-dd' y elimina posibles comillas tipográficas."""
+        if not valor:
+            raise ValueError("La fecha de nacimiento es obligatoria.")
+        limpio = valor.strip().strip('"“”')
+        from datetime import datetime as _dt
+        for fmt in ('%Y-%m-%d', '%d-%m-%Y'):
+            try:
+                return _dt.strptime(limpio, fmt).date()
+            except ValueError:
+                continue
+        raise ValueError("Formato de fecha inválido. Use DD-MM-YYYY.")
+
     if request.method == 'POST':
         action = request.POST.get('action')
         try:
@@ -448,7 +461,7 @@ def aplicacion(request):
             nombre = request.POST['nombre']
             apellido = request.POST['apellido']
             age = request.POST.get('age')
-            nacimiento = request.POST['nacimiento']
+            nacimiento_input = request.POST['nacimiento']
             gender = request.POST.get('gender')
             hypertension = request.POST.get('hypertension')
             heart_disease = request.POST.get('heart_disease')
@@ -466,6 +479,19 @@ def aplicacion(request):
             bmi = float(bmi)
             hba1c_level = float(hba1c_level)
             blood_glucose_level = float(blood_glucose_level)
+
+            # Parseo robusto de la fecha para evitar error "invalid date format"
+            try:
+                nacimiento_date = parse_fecha_flexible(nacimiento_input)
+            except ValueError as fe:
+                return render(request, 'aplicacion.html', {
+                    'error': str(fe),
+                    'rut': rut, 'nombre': nombre, 'apellido': apellido,
+                    'age': age, 'nacimiento': nacimiento_input,
+                    'gender': gender, 'bmi': bmi, 'hypertension': hypertension,
+                    'heart_disease': heart_disease, 'hba1c_level': hba1c_level,
+                    'blood_glucose_level': blood_glucose_level, 'smoking_history': smoking_history
+                })
 
             input_data = {
                 'age': [age],
@@ -494,8 +520,6 @@ def aplicacion(request):
 
             nivel_riesgo_general = calcular_nivel_riesgo_general(rf_proba, svm_risk[0], logistic_proba)
             promedio_prediccion = (rf_proba + svm_risk[0] + logistic_proba) / 3
-            # Promedio numérico de las 3 probabilidades para mostrar semáforo consolidado
-            promedio_prediccion = (rf_proba + svm_risk[0] + logistic_proba) / 3
 
             context = {
                 # Mantener datos del formulario
@@ -503,7 +527,7 @@ def aplicacion(request):
                 'nombre': nombre,
                 'apellido': apellido,
                 'age': age,
-                'nacimiento': nacimiento,
+                'nacimiento': nacimiento_date.strftime('%d-%m-%Y'),
                 'gender': gender,
                 'bmi': bmi,
                 'hypertension': hypertension,
@@ -528,7 +552,7 @@ def aplicacion(request):
                     nombre=nombre,
                     apellido=apellido,
                     edad=age,
-                    nacimiento=nacimiento,
+                    nacimiento=nacimiento_date,
                     genero=gender,
                     bmi=bmi,
                     hipertension=hypertension,
@@ -537,6 +561,7 @@ def aplicacion(request):
                     nivel_glucosa=blood_glucose_level,
                     historial_tabaquismo=smoking_history
                 )
+                context['registro_exitoso'] = True
                 
             return render(request, 'aplicacion.html', context)
 
