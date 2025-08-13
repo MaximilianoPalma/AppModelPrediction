@@ -493,6 +493,9 @@ def aplicacion(request):
             svm_risk = (1 / (1 + np.exp(-svm_proba))) * 100
 
             nivel_riesgo_general = calcular_nivel_riesgo_general(rf_proba, svm_risk[0], logistic_proba)
+            promedio_prediccion = (rf_proba + svm_risk[0] + logistic_proba) / 3
+            # Promedio numérico de las 3 probabilidades para mostrar semáforo consolidado
+            promedio_prediccion = (rf_proba + svm_risk[0] + logistic_proba) / 3
 
             context = {
                 # Mantener datos del formulario
@@ -515,6 +518,7 @@ def aplicacion(request):
                 'logistic_prediction': round(logistic_proba, 2),
                 'HbA1c_level': hba1c_level,
                 'nivel_riesgo_general': nivel_riesgo_general,
+                'promedio_prediccion': round(promedio_prediccion, 2),
                 'prediccion_realizada': True  # Flag para mostrar resultados
             }
 
@@ -719,6 +723,7 @@ def evaluacion_riesgo(request):
                 'logistic_prediction': round(logistic_proba, 2),
                 'HbA1c_level': Hba1c_level,
                 'nivel_riesgo_general': nivel_riesgo_general,
+                'promedio_prediccion': round((rf_proba + svm_risk[0] + logistic_proba) / 3, 2),
                 'prediccion_realizada': True  # Flag para mostrar resultados
             }
 
