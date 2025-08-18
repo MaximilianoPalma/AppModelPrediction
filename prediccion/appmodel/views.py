@@ -4,7 +4,8 @@ from appmodel.forms import CustomLoginForm
 from django.contrib.auth.decorators import login_required
 from .models import Paciente
 from django.shortcuts import get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
+from django.db.models import Q
 from django.conf import settings
 import joblib
 import numpy as np
@@ -166,6 +167,45 @@ def editar_paciente(request, paciente_id):
         return redirect('listado_pacientes')
     
     return render(request, 'listado.html', {'paciente': paciente})
+
+@login_required
+def editar_paciente_json(request, paciente_id):
+    """Edición rápida vía AJAX desde popup listado."""
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'error': 'Método no permitido'}, status=405)
+    paciente = get_object_or_404(Paciente, id=paciente_id)
+    fields_map = {
+        'rut': 'rut', 'nombre':'nombre', 'apellido':'apellido', 'edad':'edad', 'nacimiento':'nacimiento',
+        'genero':'genero','bmi':'bmi','hipertension':'hipertension','enfermedad_cardiaca':'enfermedad_cardiaca',
+        'nivel_hba1c':'nivel_hba1c','nivel_glucosa':'nivel_glucosa','historial_tabaquismo':'historial_tabaquismo','observaciones':'observaciones'
+    }
+    data = {}
+    for k, attr in fields_map.items():
+        if k in request.POST:
+            valor = request.POST[k]
+            if k in ('edad','bmi','nivel_hba1c','nivel_glucosa'):
+                try:
+                    if k=='edad': valor = int(valor)
+                    else: valor = float(valor)
+                except ValueError:
+                    return JsonResponse({'ok': False, 'error': f'Valor inválido para {k}'}, status=400)
+            if k in ('hipertension','enfermedad_cardiaca','historial_tabaquismo','genero'):
+                try: valor = int(valor)
+                except ValueError: return JsonResponse({'ok': False, 'error': f'Valor inválido para {k}'}, status=400)
+            if k == 'nacimiento':
+                from datetime import datetime as _dt
+                try:
+                    if valor:
+                        if '-' in valor and len(valor.split('-')[0])==4:
+                            valor = _dt.strptime(valor,'%Y-%m-%d').date()
+                        else:
+                            valor = _dt.strptime(valor,'%d-%m-%Y').date()
+                except ValueError:
+                    return JsonResponse({'ok': False, 'error': 'Formato fecha inválido (use DD-MM-YYYY)'}, status=400)
+            setattr(paciente, attr, valor)
+            data[attr] = valor
+    paciente.save()
+    return JsonResponse({'ok': True, 'paciente': data, 'id': paciente.id})
 
 @login_required
 def eliminar_paciente(request, paciente_id):
@@ -581,6 +621,57 @@ def informe(request):
 @login_required
 def soporte(request):
     return render(request, 'soporte.html')
+    
+@login_required
+def buscar_pacientes(request):
+    """Endpoint AJAX para búsqueda incremental por nombre, apellido o RUT."""
+    termino = request.GET.get('q', '').strip()
+    id_param = request.GET.get('id')
+    resultados = []
+    try:
+        if id_param:
+            p = Paciente.objects.filter(pk=id_param).first()
+            if p:
+                resultados.append({
+                    'id': p.id,
+                    'rut': formatear_rut(p.rut) if hasattr(p, 'rut') else p.rut,
+                    'nombre': p.nombre,
+                    'apellido': p.apellido,
+                    'edad': p.edad,
+                    'nacimiento': p.nacimiento.strftime('%d-%m-%Y') if p.nacimiento else '',
+                    'genero': 'Hombre' if p.genero == 1 else 'Mujer' if p.genero == 0 else 'Otro',
+                    'bmi': p.bmi,
+                    'hipertension': 'Sí' if p.hipertension else 'No',
+                    'enfermedad_cardiaca': 'Sí' if p.enfermedad_cardiaca else 'No',
+                    'nivel_hba1c': p.nivel_hba1c,
+                    'nivel_glucosa': p.nivel_glucosa,
+                    'historial_tabaquismo': 'Nunca' if p.historial_tabaquismo == 0 else 'Ex-fumador' if p.historial_tabaquismo == 1 else 'Fumador ocasional' if p.historial_tabaquismo == 2 else 'Fumador habitual',
+                    'observaciones': p.observaciones or ''
+                })
+        elif termino:
+            qs = Paciente.objects.filter(
+                Q(rut__icontains=termino) | Q(nombre__icontains=termino) | Q(apellido__icontains=termino)
+            ).order_by('apellido','nombre')[:25]
+            for p in qs:
+                resultados.append({
+                    'id': p.id,
+                    'rut': formatear_rut(p.rut) if hasattr(p, 'rut') else p.rut,
+                    'nombre': p.nombre,
+                    'apellido': p.apellido,
+                    'edad': p.edad,
+                    'nacimiento': p.nacimiento.strftime('%d-%m-%Y') if p.nacimiento else '',
+                    'genero': 'Hombre' if p.genero == 1 else 'Mujer' if p.genero == 0 else 'Otro',
+                    'bmi': p.bmi,
+                    'hipertension': 'Sí' if p.hipertension else 'No',
+                    'enfermedad_cardiaca': 'Sí' if p.enfermedad_cardiaca else 'No',
+                    'nivel_hba1c': p.nivel_hba1c,
+                    'nivel_glucosa': p.nivel_glucosa,
+                    'historial_tabaquismo': 'Nunca' if p.historial_tabaquismo == 0 else 'Ex-fumador' if p.historial_tabaquismo == 1 else 'Fumador ocasional' if p.historial_tabaquismo == 2 else 'Fumador habitual',
+                    'observaciones': p.observaciones or ''
+                })
+    except Exception as e:
+        return JsonResponse({'resultados': [], 'error': str(e)})
+    return JsonResponse({'resultados': resultados})
 
 @login_required
 def logout(request):

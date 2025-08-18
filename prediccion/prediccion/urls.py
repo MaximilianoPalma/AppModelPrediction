@@ -21,6 +21,7 @@ urlpatterns = [
     path('editar_paciente/<int:paciente_id>/', views.editar_paciente, name='editar_paciente'),
     path('eliminar_paciente/<int:paciente_id>/', views.eliminar_paciente, name='eliminar_paciente'),   
     path('reporte_paciente/<int:paciente_id>/', views.reporte_paciente, name='reporte_paciente'), 
+    path('editar_paciente_json/<int:paciente_id>/', views.editar_paciente_json, name='editar_paciente_json'),
      
     path('enviar_reporte/<int:paciente_id>/', views.enviar_reporte, name='enviar_reporte'),  
 
@@ -41,4 +42,5 @@ urlpatterns = [
 
     path('graficos/', login_required(views.generar_graficos), name='graficos'),
     path('reportes/', reporteinforme, name='reporteinforme'),
+    path('buscar-pacientes/', login_required(views.buscar_pacientes), name='buscar_pacientes'),
 ]

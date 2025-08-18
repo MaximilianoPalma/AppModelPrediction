@@ -34,25 +34,25 @@
                 <div class="dropdown">
                     <button class="dropbtn">Pacientes</button>
                     <div class="dropdown-content">
-                      <a href="{% url 'registro_paciente' %}">Registro</a>
-                      <a href="{% url 'consulta_paciente' %}">Consulta</a>
-                      <a href="{% url 'listado_pacientes' %}">Listado pacientes</a>
+                        <a href="{% url 'registro_paciente' %}">Registro</a>
+                        <a href="{% url 'consulta_paciente' %}">Consulta</a>
+                        <a href="{% url 'listado_pacientes' %}">Búsqueda</a>
                     </div>
                 </div>
                 
                 <div class="dropdown">
                     <button class="dropbtn">Modelo</button>
                     <div class="dropdown-content">
-                      <a href="{% url 'aplicacion' %}">Aplicación</a>
-                      <a href="{% url 'informe' %}">Informes</a>
+                        <a href="{% url 'aplicacion' %}">Aplicación</a>
+                        <a href="{% url 'informe' %}">Informes</a>
                     </div>
                 </div>
 
                 <div class="dropdown">
                     <button class="dropbtn" >Soporte</button>
                     <div class="dropdown-content">
-                      <a href="{% url 'registro_soporte' %}">Registro</a>
-                      <a href="{% url 'listado_soporte' %}">Listado soporte</a>
+                        <a href="{% url 'registro_soporte' %}">Registro</a>
+                        <a href="{% url 'listado_soporte' %}">Listado soporte</a>
                     </div>
                 </div>
 
@@ -76,7 +76,7 @@
         {% if user.is_authenticated %}
             <p>&copy; 2025 Plataforma Médica de Predicción de Diabetes. Todos los derechos reservados.</p>
         {% else %}
-            <p>&copy; 2025 Plataforma Médica de Predicción de Diabetes. Todos los derechos reservados. NO AUTENTICADO</p>  
+            <p>&copy; 2025 Plataforma Médica de Predicción de Diabetes. Todos los derechos reservados. NO AUTENTICADO</p>
         {% endif %}
     </footer>
 </body>
