@@ -22,11 +22,10 @@ urlpatterns = [
     path('eliminar_paciente/<int:paciente_id>/', views.eliminar_paciente, name='eliminar_paciente'),   
     path('reporte_paciente/<int:paciente_id>/', views.reporte_paciente, name='reporte_paciente'), 
     path('editar_paciente_json/<int:paciente_id>/', views.editar_paciente_json, name='editar_paciente_json'),
-     
+
     path('enviar_reporte/<int:paciente_id>/', views.enviar_reporte, name='enviar_reporte'),  
 
     path('aplicacion/', login_required(views.aplicacion), name='aplicacion'),
-    path('informe/', login_required(views.informe), name='informe'),
 
     path('soporte/', login_required(views.soporte), name='soporte'),
     path('registro_soporte/', views.registro_soporte, name='registro_soporte'),

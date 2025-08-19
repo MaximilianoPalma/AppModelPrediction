@@ -39,17 +39,11 @@
                         <a href="{% url 'listado_pacientes' %}">Búsqueda</a>
                     </div>
                 </div>
-                
-                <div class="dropdown">
-                    <button class="dropbtn">Modelo</button>
-                    <div class="dropdown-content">
-                        <a href="{% url 'aplicacion' %}">Aplicación</a>
-                        <a href="{% url 'informe' %}">Informes</a>
-                    </div>
-                </div>
+
+                <a href="{% url 'aplicacion' %}"> <button class="button primary dropbtn" >Aplicación</button> </a>
 
                 <div class="dropdown">
-                    <button class="dropbtn" >Soporte</button>
+                    <button class="dropbtn">Soporte</button>
                     <div class="dropdown-content">
                         <a href="{% url 'registro_soporte' %}">Registro</a>
                         <a href="{% url 'listado_soporte' %}">Listado soporte</a>

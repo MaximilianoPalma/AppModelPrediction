@@ -615,10 +615,6 @@ def aplicacion(request):
     return render(request, 'aplicacion.html')
 
 @login_required
-def informe(request):
-    return render(request, 'informe.html')
-
-@login_required
 def soporte(request):
     return render(request, 'soporte.html')
     
@@ -850,63 +846,6 @@ def evaluacion_riesgo(request):
             return render(request, 'consulta.html', {'error': 'Ocurrió un error durante la predicción.'})
 
     return render(request, 'consulta.html')
-
-
-@login_required
-def descargar_reporte(request):
-    width, height = 800, 600
-    img = Image.new('RGB', (width, height), color=(255, 255, 255))
-    d = ImageDraw.Draw(img)
-
-    d.text((10, 10), "Reporte de Casos de Diabetes en Chile", fill=(0, 0, 0))
-    d.text((10, 50), f"Promedio diario de casos: {request.GET.get('promedio_diario', 'N/A')}", fill=(0, 0, 0))
-    d.text((10, 70), f"Total semanal de casos: {request.GET.get('total_semanal', 'N/A')}", fill=(0, 0, 0))
-    d.text((10, 90), f"Total de exámenes realizados: {request.GET.get('test_realizados', 'N/A')}", fill=(0, 0, 0))
-    d.text((10, 110), f"Nuevos casos diarios: {request.GET.get('nuevos_casos_diarios', 'N/A')}", fill=(0, 0, 0))
-    d.text((10, 130), f"Nuevos casos semanales: {request.GET.get('nuevos_casos_semanales', 'N/A')}", fill=(0, 0, 0))
-    d.text((10, 150), f"Fallecidos reportados esta semana: {request.GET.get('fallecidos_semanales', 'N/A')}", fill=(0, 0, 0))
-    d.text((10, 170), f"Fallecidos totales: {request.GET.get('fallecidos_totales', 'N/A')}", fill=(0, 0, 0))
-
-    response = HttpResponse(content_type='image/png')
-    response['Content-Disposition'] = 'attachment; filename="reporte_diabetes.png"'
-    img.save(response, 'PNG')
-
-    return response
-
-def generar_reporte_vista():
-    semana_epidemiologica = "41 semana epidemiológica 2024 (6 al 12 de octubre)"
-    promedio_diario_casos = 44
-    total_semanal_casos = 306
-    test_realizados = 5707
-    test_hba1c = 4549 
-    test_glucosa = 1158  
-    fallecidos_totales = 58017
-    fallecidos_semanales = 11
-    fallecidos_confirmados = 6
-    fallecidos_sospechosos = 5
-
-    reporte = f"""
-    ***{semana_epidemiologica}***
-
-    **Casos Confirmados:**
-    - Promedio diario de casos: {promedio_diario_casos}
-    - Total semanal de casos: {total_semanal_casos}
-
-    **Laboratorio:**
-    - Número de exámenes informados en la última semana: {test_realizados}
-        - Test de Hemoglobina Glicosilada (HbA1c): {test_hba1c}
-        - Test de glucosa en ayunas: {test_glucosa}
-
-    **Casos Fallecidos:**
-    - Fallecidos reportados en la última semana: {fallecidos_semanales}
-        - Confirmados: {fallecidos_confirmados}
-        - Sospechosos o probables: {fallecidos_sospechosos}
-    - Casos fallecidos totales en Chile: {fallecidos_totales}
-
-    Fuente: Departamento de Epidemiología, Ministerio de Salud
-    """
-
-    return reporte
 
 import requests
 from bs4 import BeautifulSoup
