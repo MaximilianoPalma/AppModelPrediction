@@ -10,8 +10,6 @@ urlpatterns = [
     path('', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
     
-    path('index/', login_required(views.index), name='index'),
-    
     path('inicio/', login_required(views.index), name='inicio'),
     
     path('listado/', login_required(views.listado_pacientes), name='listado_pacientes'),
