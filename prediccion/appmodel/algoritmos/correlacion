@@ -1,0 +1,67 @@
+# =======================================
+#   MATRIZ DE CORRELACIÓN - TRABAJO DE TÍTULO
+# =======================================
+
+import os
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set_theme(style="whitegrid")
+
+# --- Ruta del archivo CSV ---
+base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+data_path = os.path.join(base_dir, 'algoritmos', 'diabetes_prediction_dataset.csv')
+
+# --- Cargar dataset ---
+print("Leyendo archivo CSV...")
+df = pd.read_csv(data_path)
+
+# --- Renombrar columnas al español ---
+df = df.rename(columns={
+    "age": "Edad",
+    "hypertension": "Hipertensión",
+    "heart_disease": "Enfermedad Cardíaca",
+    "bmi": "Índice de Masa Corporal (IMC)",
+    "HbA1c_level": "Nivel HbA1c",
+    "blood_glucose_level": "Nivel de Glucosa",
+    "gender_Female": "Género_Femenino",
+    "gender_Male": "Género_Masculino",
+    "gender_Other": "Género_Otro",
+    "smoking_history_current": "Tabaquismo_Actual",
+    "smoking_history_non-smoker": "No_Fumador",
+    "smoking_history_past-smoker": "Ex_Fumador",
+    "diabetes": "Diabetes"
+})
+
+# --- Convertir edad a entero ---
+if "Edad" in df.columns:
+    df["Edad"] = df["Edad"].astype(int)
+
+# --- Calcular matriz de correlación ---
+matriz_correlacion = df.corr(numeric_only=True)
+print("\nMatriz de correlación:\n", matriz_correlacion)
+
+# --- Graficar heatmap ---
+plt.figure(figsize=(10, 8))
+sns.heatmap(
+    matriz_correlacion,
+    annot=True,
+    cmap="coolwarm",
+    fmt=".2f",
+    linewidths=0.5
+)
+
+plt.title("Matriz de Correlación entre Variables", fontsize=14, weight="bold")
+
+# Ajustar etiquetas
+plt.xticks(rotation=45, ha="right", fontsize=9)
+plt.yticks(rotation=0, fontsize=9)
+
+# 🔧 Ajustar márgenes: más espacio abajo e izquierda
+plt.gcf().subplots_adjust(bottom=0.25, left=0.25)
+
+# Guardar y mostrar
+plt.savefig("matriz_correlacion.png", dpi=300, bbox_inches="tight")
+plt.show()
+
