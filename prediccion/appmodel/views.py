@@ -33,6 +33,25 @@ import urllib3
 import json
 from django.core.mail import EmailMessage
 
+def listar_png_charts():
+    """Devuelve lista de rutas relativas de gráficos PNG en /static para mostrarlos en la plantilla.
+    Se filtran nombres típicos de gráficos y se excluye el mapa mundial mostrado aparte.
+    """
+    static_dir = os.path.join(settings.BASE_DIR, 'static')
+    patrones_validos = ('afico_', 'grafico_', 'chart_', 'plot_')
+    resultado = []
+    if not os.path.isdir(static_dir):
+        return resultado
+    for nombre in sorted(os.listdir(static_dir)):
+        if not nombre.lower().endswith('.png'):
+            continue
+        if nombre == 'mapamundialdiabetes.png':
+            continue
+        if nombre.startswith(patrones_validos):
+            # Retornamos relativo para uso con {% static %} sin duplicar barra
+            resultado.append(f'static/{nombre}')
+    return resultado
+
 @login_required
 def base(request):
     return render(request, 'base.html')
@@ -52,8 +71,7 @@ def login(request):
 def index(request):
     try:
         datos_reporte = calcular_datos_reporte()
-        graficos = generarGraficos()
-
+        graficos = listar_png_charts()
         context = {
             'graficos': graficos,
             'promedio_diario': datos_reporte['promedio_diario'],
@@ -65,15 +83,10 @@ def index(request):
             'fallecidos_totales': datos_reporte['fallecidos_totales'],
             'fallecidos_semanales': datos_reporte['fallecidos_semanales'],
         }
-
         return render(request, 'inicio.html', context)
-
     except Exception as e:
-        print(f"❌ Error al generar gráficos o reporte: {e}")
-        return render(request, 'inicio.html', {
-            'graficos': [],
-            'error': 'Error al generar el reporte o los gráficos.'
-        })
+        print(f"❌ Error al preparar inicio: {e}")
+        return render(request, 'inicio.html', {'graficos': [], 'error': 'Error al preparar los gráficos.'})
 
 
 @login_required
@@ -210,12 +223,16 @@ def editar_paciente_json(request, paciente_id):
 @login_required
 def eliminar_paciente(request, paciente_id):
     paciente = get_object_or_404(Paciente, id=paciente_id)
-    
     if request.method == 'POST':
         paciente.delete()
+        # Si es solicitud AJAX (fetch), devolver JSON y no redirigir
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.headers.get('Accept','').startswith('application/json'):
+            return JsonResponse({'ok': True, 'id': paciente_id, 'message': 'Paciente eliminado'})
         messages.success(request, "Paciente eliminado exitosamente.")
-        return redirect('listado_pacientes') 
-    
+        return redirect('listado_pacientes')
+    # GET no debería eliminar: devolver 405 en JSON si AJAX
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'ok': False, 'error': 'Método no permitido'}, status=405)
     return render(request, 'listado.html', {'paciente': paciente})
 
 @login_required
@@ -528,7 +545,7 @@ def aplicacion(request):
                     'error': str(fe),
                     'rut': rut, 'nombre': nombre, 'apellido': apellido,
                     'age': age, 'nacimiento': nacimiento_input,
-                    'gender': gender, 'bmi': bmi, 'hypertension': hypertension,
+                    'gender': gender, 'bmi': bmi, 'hipertension': hipertension,
                     'heart_disease': heart_disease, 'hba1c_level': hba1c_level,
                     'blood_glucose_level': blood_glucose_level, 'smoking_history': smoking_history
                 })
@@ -570,7 +587,7 @@ def aplicacion(request):
                 'nacimiento': nacimiento_date.strftime('%d-%m-%Y'),
                 'gender': gender,
                 'bmi': bmi,
-                'hypertension': hypertension,
+                'hipertension': hypertension,
                 'heart_disease': heart_disease,
                 'hba1c_level': hba1c_level,
                 'blood_glucose_level': blood_glucose_level,
