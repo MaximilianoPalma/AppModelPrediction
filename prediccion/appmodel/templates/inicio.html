@@ -66,15 +66,11 @@
 <div class="report-container">
     <h3 class="text-center mt-5">📈 Gráficos Nacionales</h3>
     <div class="graficos-container">
-        {% if graficos %}
-            {% for grafico in graficos %}
-            <div class="grafico mb-4 text-center">
-                <img src="{% static grafico|cut:'static/' %}" alt="Gráfico {{ forloop.counter }}" class="img-fluid rounded shadow" style="max-height:500px; width:100%; object-fit:contain;" loading="lazy">
-            </div>
-            {% endfor %}
-        {% else %}
-            <p class="text-center text-muted">No hay gráficos disponibles.</p>
-        {% endif %}
+        {% for grafico in graficos %}
+        <div class="grafico mb-4">
+            <iframe src="{% static grafico|slice:'19:' %}" frameborder="0" width="100%" height="500px"></iframe>
+        </div>
+        {% endfor %}
     </div>
 </div>
 

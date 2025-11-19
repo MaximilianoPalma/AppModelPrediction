@@ -34,23 +34,14 @@
             <h2 style="margin:0 0 14px; text-align:center;">Ficha Paciente</h2>
                 <form id="form-edicion-paciente" onsubmit="return false;">
                         <input type="hidden" id="paciente-id-hidden" value="">
-                        <table id="tabla-detalle" class="ficha-table" aria-describedby="titulo-ficha">
-                            <thead>
-                                <tr class="ficha-head">
-                                    <th scope="col" style="text-align:right; width:40%;">Campo</th>
-                                    <th scope="col" style="text-align:left;">Valor</th>
-                                </tr>
-                            </thead>
+                        <table id="tabla-detalle" class="ficha-table">
                             <tbody id="tabla-detalle-body"><!-- filas dinámicas --></tbody>
                         </table>
                 </form>
             <div id="acciones-view" style="display:flex; gap:10px; justify-content:center; margin-top:18px;">
                     <button type="button" class="btn-primario" onclick="entrarEdicion()">Editar</button>
                     <button type="button" class="btn-info" onclick="descargarPDFActual()">Descargar</button>
-                    <form id="form-eliminar-paciente" method="post" style="display:inline;" onsubmit="return confirmarEliminar();">
-                        {% csrf_token %}
-                        <button type="submit" class="btn-secundario" style="background:#d93025; border:none;" title="Eliminar paciente">Eliminar</button>
-                    </form>
+                    <button type="button" class="btn-secundario" onclick="abrirEnvioCorreo()">Enviar</button>
                     <button type="button" class="btn-outline" onclick="cerrarDetalle()">Cerrar</button>
             </div>
             <div id="acciones-edit" style="display:none; gap:10px; justify-content:center; margin-top:18px;">
@@ -108,11 +99,6 @@
             const encontrado = (data.resultados||[])[0];
         // Guardar id
         document.getElementById('paciente-id-hidden').value = encontrado.id;
-        // Actualizar action del formulario de eliminación
-        const formEliminar = document.getElementById('form-eliminar-paciente');
-        if(formEliminar){
-            formEliminar.action = `{% url 'eliminar_paciente' 0 %}`.replace('0', encontrado.id);
-        }
             if(!encontrado){return;}
         // Resetear flag de edición al abrir nuevo detalle (solo si no es una actualización después de guardar)
         datosEditados = false;
@@ -259,45 +245,6 @@
         if(!id) return;
         // Reutilizar popup correo original si existe
         openEmailPopup(id);
-    }
-    function confirmarEliminar(){
-        if(!confirm('¿Seguro que desea eliminar este paciente? Esta acción no se puede deshacer.')) return false;
-        // Interceptar envío para hacerlo vía fetch
-        const form = document.getElementById('form-eliminar-paciente');
-        const id = document.getElementById('paciente-id-hidden').value;
-        if(!id) return false;
-        const action = form.action;
-        const csrf = form.querySelector('input[name="csrfmiddlewaretoken"]').value;
-        fetch(action, {
-            method: 'POST',
-            headers: { 'X-CSRFToken': csrf, 'X-Requested-With': 'XMLHttpRequest', 'Accept':'application/json' },
-        }).then(r=>r.json()).then(data=>{
-            if(data.ok){
-                mostrarToast('Paciente eliminado');
-                cerrarDetalle();
-                // Re-ejecutar búsqueda actual sin perder término
-                const q = inputBuscador.value.trim();
-                if(q){ buscar(q); }
-            } else {
-                mostrarToast(data.error || 'Error al eliminar','error');
-            }
-        }).catch(()=> mostrarToast('Error de red','error'));
-        return false; // Prevenir envío normal
-    }
-    // Toast simple reutilizable
-    function mostrarToast(msg, tipo='ok'){
-        let el = document.getElementById('toast-notify');
-        if(!el){
-            el = document.createElement('div');
-            el.id='toast-notify';
-            el.style.cssText='position:fixed; top:20px; right:20px; background:#2563eb; color:#fff; padding:12px 18px; border-radius:8px; font-size:14px; box-shadow:0 4px 14px rgba(0,0,0,.25); z-index:2000; opacity:0; transition:opacity .25s;';
-            document.body.appendChild(el);
-        }
-        el.style.background = tipo==='error' ? '#dc2626' : '#2563eb';
-        el.textContent = msg;
-        requestAnimationFrame(()=>{ el.style.opacity=1; });
-        clearTimeout(el._t);
-        el._t = setTimeout(()=>{ el.style.opacity=0; }, 3000);
     }
     </script>
 
